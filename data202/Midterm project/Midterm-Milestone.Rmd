@@ -1,0 +1,34 @@
+---
+title: "DATA 202 Midterm Project"
+author: "Sherise Immanuela and Tanya Nyamwiwa"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_download: true
+---
+
+```{r setup, include=FALSE}
+# Set some useful chunk options for code chunks.
+knitr::opts_chunk$set(
+  echo = TRUE,
+  error = TRUE,    # display errors but keep going.
+  comment = "",    # don't add '##' characters before output.
+  message = FALSE  # don't include messages in the knitted output (check them in RStudio)
+  )
+library(tidyverse)
+theme_set(theme_bw())
+```
+
+## How Did Volume Affect the SPY ETF?
+
+The graph we will be reproducing
+
+![](Data%20202.png){width="543"}
+
+The source has various graphs, that we hope to merge together (not on one plot, but maybe side-by-side).
+
+The source of our graphic is Kaggle and here is the link: [How did volume effect the SPY ETF](https://www.kaggle.com/code/sladewoodard/how-did-volume-effect-the-spy-etf/notebook)
+
+There is no initial claim, but the objective is to determine whether or not volume influences investments. The final conclusion after the wrangling and analysis states that that may be a plausible claim, but proves to be incomplete so far...
+
+The data used is from the Huge Stock Market Dataset. There is a lot of data, so the process of selection might be tough. The variables are Date, Open, High, Low, Close, Volume, OpenInt.

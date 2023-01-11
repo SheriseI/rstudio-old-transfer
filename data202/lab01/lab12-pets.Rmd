@@ -1,0 +1,45 @@
+---
+title: "Lab 1.2 - The Seattle Pets Dataset"
+author: "Sherise Immanuela"
+date: "Fall 2022"
+output: html_document
+---
+
+This RMarkdown document presents a preliminary analysis of Seattle&rsquo;s [pet licenses dataset](https://data.seattle.gov/Community/Seattle-Pet-Licenses/jguv-t9rb). It interleaves text, code, and code output. 
+
+## Loading the Dataset
+
+The following code *chunk* loads the tidyverse library, reads the CSV file containing the Seattle pet license dataset, and saves that dataset under the name `seattle_pets`. The code assumes that the CSV file is loaded in a sub-directory, `data`, of the directory that contains this document.
+
+```{r setup, message=FALSE}
+library(tidyverse)
+seattle_pets <- read_csv("data/Seattle_Pet_Licenses.csv")
+```
+
+## Viewing the Structure of the Dataset
+
+We can now view the dataset as it is stored in R.
+
+```{r pets}
+seattle_pets
+```
+
+Based on the information provided in the previous section, we can see that the pets dataset contains how many of the following:
+
+- Pets (i.e., rows, a.k.a. *records*): 44.565
+- Variables (i.e., columns, a.k.a. *fields*): 7
+
+## Analyzing the Dataset
+
+We can now count the number of each species using the `count()` function.
+
+```{r count-by-species}
+count(seattle_pets, Species, sort=TRUE)
+```
+
+There are four different species, and the most common species is Dog.
+
+``` {r count-by-name}
+count(seattle_pets, `Animal's Name`, sort=TRUE)
+```
+The most popular name is Luna.

@@ -1,0 +1,367 @@
+---
+title: "Hotel Booking Demand Predictive Analytics"
+author: "Sherise Immanuela & Tanya Nyamwiwa"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_download: true
+---
+
+```{r setup, include=FALSE}
+# Set some useful chunk options for code chunks.
+knitr::opts_chunk$set(
+  echo = TRUE,
+  error = TRUE,    # display errors but keep going.
+  comment = "",    # don't add '##' characters before output.
+  message = FALSE  # don't include messages in the knitted output (check them in RStudio)
+  )
+library(tidyverse)
+library(tidymodels)
+library(glue)
+library(rsample)
+library(rpart.plot)
+library(knitr)
+
+theme_set(theme_bw())
+```
+
+## Overview
+
+### Question
+
+Can we predict hotel occupancy for each month in order to determine how many full-time staff we need to run the hotel (fixed cost), and how many additional part-time staff do we need to hire for peak seasons?
+
+## Prior Work
+
+### Summary and critique of prior work
+
+[EDA & Predictive Analysis for Hotel Booking Data, Anshul](https://www.kaggle.com/code/anshularya/eda-predictive-analysis-for-hotel-booking-data/notebook)
+
+This EDA concludes with a prediction of booking cancellation. Prior to this, the report looks at the preferred location of the hotels, then goes on to see the cancellation by type of hotel. The data scientist learns when cancellation is more likely to happen
+
+What did they do well that is inspiring?
+
+The variety of graphs to understand different aspects of this data is inspiring
+
+What could they improve on or explore further?
+
+More notes and explanation of why certain analysis is taking place would be helpful especially to less experienced data scientists
+
+Do you trust their results? Why or why not?
+
+Yes. This is well thought out, despite the lack of commentary, I think this is good due to the above stated inspiring points
+
+[Hotel Booking EDA, Harsha Palnitkar](https://www.kaggle.com/code/harshapalnitkar/hotel-booking-eda/notebook)
+This individual looks at the different types of customers, the most common month, the most preferred booking ammenity chosen, among other things. Market segments and cancelled bookings are also analyzed.
+What did they do well that is inspiring?
+
+The precision and concision here is impressive
+
+This is an EDA performed using Python and it is interesting to see the slight differences
+
+What could they improve on or explore further?
+
+The individual does not provide an explicit conclusion from all of this analysis and so it feels a little abrupt.
+
+[hotel_booking, Ahmed Elgebaly](https://www.kaggle.com/code/ahmedsafwatgb20/hotel-booking/notebook)
+This data scientist looks into different aspects of booking and draws clear and distinct conclusions. Along with this, recommendations are given from the findings. The EDA looks into booking trends in order to provide promotional suggestions.
+
+What did they do well that is inspiring?
+Clear connections are made with good conclusions and recommendations
+I think this might be the best one as suggestions are also provided with each analysis that is done!
+
+What could they improve on or explore further?
+Other things that may lead to cancellation
+
+[Hotel Bookings- Basic EDA, Azmain Morshed](https://www.kaggle.com/code/azmainmorshed/hotel-bookings-basic-eda/notebook)
+
+[EDA of bookings and ML to predict cancelations, Marcus Wingen](https://www.kaggle.com/code/marcuswingen/eda-of-bookings-and-ml-to-predict-cancelations)
+
+[Hotel Booking Prediction (99.5% acc), Nitesh Yadav](https://www.kaggle.com/code/niteshyadav3103/hotel-booking-prediction-99-5-acc)
+
+### How this project extends prior work
+
+## Approach
+
+### Problem Description
+
+Prior work has analyzed booking, lead time, and arrival date trends to understand which months have the most bookings and therefore total occupancy. We will make use of this technique to then understand how many staff members a city and a resort hotel will need to work full-time, regardless of the total occupancy as a fixed cost. Then, we will see if we need to hire additional part-time staff members for peak months when the total occupancy of the hotel has increased. We would also be able to determine when to hire the part-time staff as (maybe a month before the peak month) in order to ensure maximum training of the people for the job.
+
+### Data
+
+The original dataset contains 119,390 observations and each observation represents 32 variables:
+Resort or City Hotel
+Is the reservation cancelled?
+Number of days that elapsed between the entering date of the booking into the PMS and the arrival date
+Arrival year
+Arrival month
+Arrival week number
+Arrival day
+Number of weekend nights spent/booked
+Number of week nights spent/booked
+Number of adults
+Number of children
+Number of babies
+Type of meal in package
+Country of booking
+Distribution channel
+Previous cancellations
+Previous reservations not cancelled
+Reserved room type
+Assigned room type
+Booking change
+Deposit type
+Agent
+Company
+Days in waiting list
+Customer type
+Adr (?)
+Required car parking spaces
+Total special requests
+Reservation status
+Reservation status date
+
+#### Provenance
+
+The data was downloaded from Kaggle.
+As seen from the Kaggle project:
+"The data is originally from the article Hotel Booking Demand Datasets, written by Nuno Antonio, Ana Almeida, and Luis Nunes for Data in Brief, Volume 22, February 2019.
+
+The data was downloaded and cleaned by Thomas Mock and Antoine Bichat for #TidyTuesday during the week of February 11th, 2020."
+
+#### Structure
+
+#### Appropriateness for task
+
+This is a good data source because it has so many variables that make it easy to look into different aspects
+
+### Modeling Question and Approach
+
+## Exploratory Data Analysis
+
+```{r}
+hotel_bookings <- read.csv("data/hotel_bookings.csv")
+```
+
+Which months are the busiest?
+
+```{r}
+hotel_bookings$arrival_date_month = factor(hotel_bookings$arrival_date_month, levels = month.name)
+
+ggplot(hotel_bookings, aes(x=arrival_date_month, fill = hotel)) +
+  geom_bar(position = 'dodge') +
+  ylab('Number of Hotel Bookings ') +
+  xlab('Month')+
+  ggtitle('Average Number of Hotel Bookings per Month') +
+  labs(fill='Hotel') +
+  theme_minimal()
+
+```
+
+The busiest month of hotel bookings for both hotels is August, while the least busiest month is January.
+
+```{r}
+checkout = hotel_bookings  %>% filter(reservation_status == 'Check-Out') 
+dim(checkout)
+
+ggplot(checkout, aes(customer_type, fill=hotel)) +
+  geom_bar(stat='count', position=position_dodge()) +
+  ylab('Count') +
+  xlab('Booking type') +
+  ggtitle('Type of Booking by Different Hotel Type') +
+  labs(fill='Hotel type') +
+  theme_minimal()
+```
+
+The booking type for both hotels are similar, with transient bookings having a much higher number compared to other booking types.
+
+```{r}
+hotel_bookings |>
+  ggplot() +
+  aes(lead_time)+ 
+  geom_histogram(binwidth = 0.8,col='turquoise' )+ 
+  facet_wrap(~ is_canceled)
+```
+
+It appears that there is a similar pattern between bookings cancelled and not cancelled, so lead time may not be a useful predictor variable to predict booking cancellations. 
+
+## Modeling
+
+what is the target variable you are trying to predict
+which variables (features) you are using to predict it, and why you chose those features
+how you will measure accuracy (can you give meaningful units?)
+what validation method did you choose and why
+
+- Target variable - predicting total occupancy at a certain time
+- Variables used to predict this - arrival month as this shows historical trends of when guests arrived; number of adults and children as this shows the exact number of people that show up per hotel booking; we could also make use of lead_time as a suggestion for future directions -- the hotels should not allow cancellations after a certain lead time so as to not make a loss, and also require a deposit fee upon reaching the lead time so costs that are incurred (food and staffing) can be met regardless of booking status.
+- Validation method - cross-validation because we would like to see the accuracy of our model
+- How accuracy will be predicted - check lead time, if it is passed a certain lead time then it will not be canceled
+- Predictive model - decision tree as this is a classification task (city/resort hotel? -> occupancy above/below certain threshold? -> hire more staff? -> yes/no)
+
+### Wrangling
+
+```{r}
+hotels <- read_csv("https://tidymodels.org/start/case-study/hotels.csv")
+stay_nights <- hotels %>%
+  mutate(total_nights = stays_in_week_nights + stays_in_weekend_nights) %>%
+  mutate(booking_id = row_number()) %>%
+  uncount(total_nights) %>%
+  group_by(booking_id) %>%
+  mutate(day_to_add = row_number() - 1) %>%
+  mutate(stay_date = arrival_date + day_to_add) %>%
+  ungroup()
+```
+
+this does not reflect total occupancy, but total bookings per day for the bookings that were not cancelled
+
+```{r}
+occupancy <- stay_nights %>% count(hotel, stay_date)
+occupancy %>% 
+  ggplot(aes(x=stay_date, y=n, color = hotel)) + geom_line() 
+```
+
+
+
+
+
+### Data splitting and resampling
+
+We will reserve 25% of the data for testing
+
+```{r}
+set.seed(123)
+hotel_split <- initial_split(occupancy, prop = 3/4)
+
+hotel_train <- training(hotel_split)
+hotel_test  <- testing(hotel_split)
+glue("Using {nrow(hotel_train)} reservations to train, {nrow(hotel_test)} to test")
+```
+
+
+```{r}
+model_formula <- n ~ hotel
+```
+
+linear regression model 
+
+```{r}
+lr <- fit(
+  linear_reg(),
+  model_formula,
+  data = hotel_train
+  )
+lm
+
+# these 2 methods do the same thing, but the method below extends some of findings
+
+lr_m <- lm(model_formula, data = hotel_train) %>% 
+  tidy() %>% 
+  # kable() %>% 
+  select(term, estimate)
+lr_m
+
+```
+
+tidy models recipe below
+
+```{r}
+holidays <- c("AllSouls", "AshWednesday", "ChristmasEve", "Easter", 
+              "ChristmasDay", "GoodFriday", "NewYearsDay", "PalmSunday")
+
+booking_recipe <- occupancy %>% 
+  distinct(stay_date) %>% 
+  mutate(numeric_date = as.numeric(stay_date)) %>% 
+  recipe(n ~ hotel, data = hotel_train) %>% 
+  step_date(stay_date) %>% 
+  step_holiday(stay_date, holidays = holidays) %>% 
+  step_rm(stay_date) %>% 
+  step_dummy(all_nominal_predictors()) %>% 
+  step_zv(all_predictors()) %>% 
+  step_normalize(all_predictors())
+
+ 
+```
+
+workflow
+```{r}
+lr_workflow <- 
+  workflow() %>% 
+  add_model(lr) %>% 
+  add_recipe(booking_recipe)
+```
+
+
+use day of week, holiday, month of the year. add columns for this. 
+formula to extract day of the week
+use linear regression to see which day of the week has more occupancy. or month
+
+random forest
+```{r}
+rf_model <-
+  rand_forest(mode = "regression") %>%
+  fit(model_formula, data = occupancy)
+boost_model <- fit(
+  boost_tree(mode = "regression"),
+  model_formula, data = occupancy)
+```
+
+```{r}
+augment(rf_model, new_data = occupancy) %>% 
+  ggplot(aes(x = adults, y = .pred, color = average_daily_rate)) +
+  geom_abline() +
+  geom_point(alpha = .5) +
+  coord_obs_pred()
+```
+
+tidymodels
+
+```{r}
+set.seed(234)
+val_set <- validation_split(hotel_train, prop = 8/10)
+```
+
+
+```{r}
+cores <- parallel::detectCores()
+cores
+```
+
+```{r}
+rf_mod <- 
+  rand_forest(mtry = tune(), min_n = tune(), trees = 1000) %>% 
+  set_engine("ranger", num.threads = cores) %>% 
+  set_mode("regression")
+```
+
+```{r}
+rf_recipe <- 
+  recipe(adults ~ ., data = hotel_train) %>% 
+  step_date(arrival_date) %>% 
+  step_holiday(arrival_date) %>% 
+  step_rm(arrival_date) 
+
+```
+
+```{r}
+rf_workflow <- 
+  workflow() %>% 
+  add_model(rf_mod) %>% 
+  add_recipe(rf_recipe)
+```
+
+```{r}
+rf_mod
+extract_parameter_set_dials(rf_mod)
+```
+
+```{r}
+set.seed(345)
+rf_res <- 
+  rf_workflow %>% 
+  tune_grid(val_set,
+            grid = 25,
+            control = control_grid(save_pred = TRUE),
+            metrics = metric_set(roc_auc))
+
+```
+

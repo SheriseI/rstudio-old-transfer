@@ -1,0 +1,37 @@
+---
+title: "DATA 202 Midterm Project Milestone 1"
+author: "Sherise Immanuela & Tanya Nyamwiwa"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_download: true
+---
+
+```{r setup, include=FALSE}
+# Set some useful chunk options for code chunks.
+knitr::opts_chunk$set(
+  echo = TRUE,
+  error = TRUE,    # display errors but keep going.
+  comment = "",    # don't add '##' characters before output.
+  message = FALSE  # don't include messages in the knitted output (check them in RStudio)
+  )
+library(tidyverse)
+theme_set(theme_bw())
+```
+
+## Problem 1
+
+What we're doing here is ...
+
+```{r change-my-name}
+# What this code does
+
+```
+
+Based on the result, we conclude that...
+
+<https://www.wsj.com/story/why-air-travel-is-breaking-down-at-all-levels-afcd4a41>
+
+## Problem 2
+
+Now we are going to ...

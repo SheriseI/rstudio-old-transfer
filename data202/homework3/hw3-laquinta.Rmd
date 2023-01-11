@@ -1,0 +1,132 @@
+---
+title: "DATA 202 Homework 3"
+author: "Sherise Immanuela"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_download: true
+---
+
+```{r setup, include=FALSE}
+# Set some useful chunk options for code chunks.
+knitr::opts_chunk$set(
+  echo = TRUE,
+  error = TRUE,    # display errors but keep going.
+  comment = "",    # don't add '##' characters before output.
+  message = FALSE  # don't include messages in the knitted output (check them in RStudio)
+  )
+library(tidyverse)
+theme_set(theme_bw())
+```
+
+## Loading Data
+```{r}
+dennys <- read_rds("data/dennys.rds")
+laquinta <- read_rds("data/laquinta.rds")
+states <- read_csv("data/states.csv", col_types = cols(
+  name = col_character(),
+  abbreviation = col_character(),
+  area = col_double()
+))
+```
+
+## Exercises
+```{r}
+dn_ak <- dennys %>%
+  filter(state == "AK")
+```
+
+1. There are 3 Denny’s locations in Alaska. 
+
+```{r}
+lq_ak <- laquinta %>%
+  filter(state == "AK")
+```
+
+2. There are 2 La Quinta locations in Alaska.
+
+```{r}
+dn_lq_ak <- full_join(dn_ak, lq_ak, by = "state",
+                      suffix = c("_dn", "_lq"))
+```
+
+3. There are 6 pairings between all Denny’s and all La Quinta locations in Alaska.
+4. There are 6 observations in the joined dn_lq_ak data frame. 
+
+```{r}
+# Great-circle distance, Implementation from dsbox
+haversine <- function(long1, lat1, long2, lat2) {
+  # convert to radians
+  long1 = long1 * pi / 180
+  lat1  = lat1  * pi / 180
+  long2 = long2 * pi / 180
+  lat2  = lat2  * pi / 180
+  
+  # Earth mean radius in km (WGS84 ellipsoid)
+  R = 6371.009
+  
+  # Compute the distance in km
+  a = sin((lat2 - lat1)/2)^2 + cos(lat1) * cos(lat2) * sin((long2 - long1)/2)^2
+  d = R * 2 * asin(sqrt(a))
+  return(d)
+}
+
+dn_lq_ak <- dn_lq_ak %>%
+  mutate(distance = haversine(longitude_dn, latitude_dn, longitude_lq, latitude_lq))
+```
+
+```{r}
+nearest_dn_lq <- dn_lq_ak %>% 
+  group_by(address_lq) %>%
+  count(distance, sort=TRUE) %>%
+  slice_head()
+```
+
+There are 2 La Quinta locations in Alaska that are “next to Denny’s”.
+
+## Exercises - Maryland
+```{r}
+dn_md <- dennys %>%
+  filter(state == "MD")
+```
+
+```{r}
+lq_md <- laquinta %>%
+  filter(state == "MD")
+```
+
+```{r}
+dn_lq_md <- full_join(dn_md, lq_md, by = "state",
+                      suffix = c("_dn", "_lq"))
+```
+
+```{r}
+# Great-circle distance, Implementation from dsbox
+haversine <- function(long1, lat1, long2, lat2) {
+  # convert to radians
+  long1 = long1 * pi / 180
+  lat1  = lat1  * pi / 180
+  long2 = long2 * pi / 180
+  lat2  = lat2  * pi / 180
+  
+  # Earth mean radius in km (WGS84 ellipsoid)
+  R = 6371.009
+  
+  # Compute the distance in km
+  a = sin((lat2 - lat1)/2)^2 + cos(lat1) * cos(lat2) * sin((long2 - long1)/2)^2
+  d = R * 2 * asin(sqrt(a))
+  return(d)
+}
+
+dn_lq_md <- dn_lq_md %>%
+  mutate(distance = haversine(longitude_dn, latitude_dn, longitude_lq, latitude_lq))
+```
+
+```{r}
+nearest_dn_md <- dn_lq_md %>% 
+  group_by(address_lq) %>%
+  count(distance, sort=TRUE) %>%
+  slice_head()
+```
+
+There are 6 La Quinta locations in Maryland that are less than 6 miles from the nearest Denny's. 

@@ -1,0 +1,34 @@
+---
+title: "Quiz 1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+```{r}
+my_radius <- 25
+```
+
+
+The area of a circle with radius `my_radius` equal to `r my_radius` is `r pi * my_radius^2`.
+```{r}
+library(tidyverse)
+mpg
+```
+
+```{r}
+ggplot(filter(mpg, manufacturer == "ford"), aes(x = displ, y = hwy)) + 
+  geom_point(mapping = aes(color = class))
+```
+
+
+```{r}
+mpg %>% 
+  filter(manufacturer == "ford") %>%
+  ggplot() +
+  aes(x = displ, y = hwy) +
+  geom_point(mapping = aes(color = class))
+```

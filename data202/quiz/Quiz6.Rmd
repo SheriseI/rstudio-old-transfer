@@ -1,0 +1,50 @@
+---
+title: "DATA 202 Homework X"
+author: "Your Name"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_download: true
+---
+
+```{r setup, include=FALSE}
+# Set some useful chunk options for code chunks.
+knitr::opts_chunk$set(
+  echo = TRUE,
+  error = TRUE,    # display errors but keep going.
+  comment = "",    # don't add '##' characters before output.
+  message = FALSE  # don't include messages in the knitted output (check them in RStudio)
+  )
+library(tidyverse)
+theme_set(theme_bw())
+```
+
+## Problem 1
+
+What we're doing here is ...
+
+```{r change-my-name}
+# What this code does
+```
+
+Based on the result, we conclude that...
+
+## Problem 2
+```{r}
+product <- c("A1", "A2")
+price <- c("2", "3")
+df1 <- data.frame(product, price)
+```
+
+```{r}
+product <- c("Q1-A1", "Q1-A2")
+supplier <- c("DDW", "AZZ")
+df2 <- data.frame(product, supplier)
+```
+
+```{r}
+dfj <- inner_join(df1, df2, by="product")
+```
+
+
+

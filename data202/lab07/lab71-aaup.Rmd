@@ -1,0 +1,154 @@
+---
+title: "Lab 7.1 - Faculty Hiring Patterns"
+author: "Sherise Immanuela"
+date: "Fall 2022"
+output:
+  html_document:
+    code_download: true
+---
+
+```{r setup, include = FALSE}
+# Set some useful chunk options for code chunks.
+knitr::opts_chunk$set(
+  echo = TRUE,
+  error = TRUE,    # display errors but keep going.
+  comment = "",    # don't add '##' characters before output.
+  message = FALSE  # don't include messages in the knitted output (check them in RStudio)
+  )
+library(tidyverse)
+theme_set(theme_bw())
+```
+
+This document explores the claim that universities are increasingly hiring more part-time faculty and less full-time faculty. It starts with a rather poorly designed plot, which shows the trend but only at the cost of some considerable effort on the part of the reader, and improves the visualization, which shows the trend more clearly.
+
+## Analysing the Original Visualization
+
+The American Association of University Professors (AAUP), a nonprofit membership association of faculty and other academic professionals, created [this report](https://www.aaup.org/sites/default/files/files/AAUP_Report_InstrStaff-75-11_apr2013.pdf). The report discusses trends in instructional staff employees between 1975 and 2011, and contains a visualization very similar to this one:
+
+![Instructional staff employment trends](https://cs.calvin.edu/courses/info/601/07tidy/lab/images/staff-employment.png){width="700px"}
+
+The plot above is a multiple bar chart. The y-axis represents the variable `faculty_type`, the x-axis represents count, and the one color represents one year.
+
+## Designing Alternate Visualizations
+
+1. My first alternative design consists of a bar graph, similar to the one above, but faceted by faculty_type. I also made the bars vertical instead of horizontal. This would help us to see the difference in the count of faculty_type by year more clearly. 
+
+2. My second alternative design is also a bar graph, but a vertical stacked bar graph that shows the proportion of faculty on its y-axis and years on its x-axis. Each bar represents a faculty type. This would make it easier to see the growth/decline of faculty types over the years.
+
+## Rebuilding the Visualization
+
+We now update the visualization incrementally, starting with an approximation of the original.
+
+### 1. Reproduce the original plot.
+
+```{r}
+staff <- read_csv("data/instructional-staff.csv")
+
+staff_long <- staff %>% 
+  gather( key = "year", value = "percentage", 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
+```
+
+```{r}
+staff_long %>% 
+  ggplot() +
+  aes(y = faculty_type, x = percentage, fill = year) +
+  labs(title = "Instructional Staff Employment Trends (1975-2011)", x = "% of faculty", y = "faculty type", caption = "Source: AAUP") +
+  geom_col(position = "dodge")+
+  scale_fill_viridis_d()
+```
+
+### 2. Convert to a stacked bar plot.
+
+We'd like to more directly compare the hiring levels of the different faculty types.
+
+```{r}
+staff_long %>% 
+  ggplot() +
+  aes(y = year, x = percentage, fill = faculty_type) +
+  labs(title = "Instructional Staff Employment Trends (1975-2011)", x = "% of faculty", y = "Year", caption = "Source: AAUP") +
+  geom_col(position = "fill")+
+  scale_fill_viridis_d() +
+  theme_minimal()
+```
+
+### 3. Convert to a line plot.
+
+Line plots tend to be good for view values over time.
+
+```{r}
+staff_long %>% 
+  ggplot() +
+  aes(x = as.numeric(year), y = percentage) +
+  labs(title = "Instructional Staff Employment Trends (1975-2011)", x = "year", y = "% of faculty", caption = "Source: AAUP") +
+  geom_line(aes(color = faculty_type))+
+  geom_point(aes(color = faculty_type))+
+  scale_fill_viridis_d() +
+  theme_minimal()
+```
+
+### 4. Just show the numbers.
+
+Sometimes, simply displaying numbers is as effective as visualizing them. Let's make the *table* below, which shows the changes in hiring levels, i.e., the 2011 percentage minus the 1975 percentage.
+
+```{r}
+# year2 <- select(staff_long, year = 2011)
+
+staff_table <- staff_long %>% 
+  pivot_wider(names_from = year, values_from = percentage) %>%
+  select(faculty_type, `1975`, `2011`) %>%
+  mutate(change = `2011`-`1975`)
+
+staff_table 
+```
+
+
+<table>
+<thead>
+<tr class="header">
+<th align="left">faculty_type</th>
+<th align="right">1975</th>
+<th align="right">2011</th>
+<th align="right">change</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Full-Time Tenured Faculty</td>
+<td align="right">29.0</td>
+<td align="right">16.7</td>
+<td align="right">-12.3</td>
+</tr>
+<tr class="even">
+<td align="left">Full-Time Tenure-Track Faculty</td>
+<td align="right">16.1</td>
+<td align="right">7.4</td>
+<td align="right">-8.7</td>
+</tr>
+<tr class="odd">
+<td align="left">Full-Time Non-Tenure-Track Faculty</td>
+<td align="right">10.3</td>
+<td align="right">15.4</td>
+<td align="right">5.1</td>
+</tr>
+<tr class="even">
+<td align="left">Part-Time Faculty</td>
+<td align="right">24.0</td>
+<td align="right">41.3</td>
+<td align="right">17.3</td>
+</tr>
+<tr class="odd">
+<td align="left">Graduate Student Employees</td>
+<td align="right">20.5</td>
+<td align="right">19.3</td>
+<td align="right">-1.2</td>
+</tr>
+</tbody>
+</table>
+
+Notes:
+
+- You can format the table by piping the resulting dataframe through `knitr::kable()`.
+
+## Drawing Conclusions
+
+From the graphs above, we can conclude that universities are hiring more part-time faculty and less full-time faculty. This might be because it's cheaper to hire part-time faculty, or there might be less people interested in being full-time faculty.

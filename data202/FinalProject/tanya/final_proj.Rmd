@@ -1,0 +1,202 @@
+---
+title: "Hotel Booking Demand Predictive Analytics"
+author: "Sherise Immanuela & Tanya Nyamwiwa"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_download: true
+---
+
+```{r setup, include=FALSE}
+# Set some useful chunk options for code chunks.
+knitr::opts_chunk$set(
+  echo = TRUE,
+  error = TRUE,    # display errors but keep going.
+  comment = "",    # don't add '##' characters before output.
+  message = FALSE  # don't include messages in the knitted output (check them in RStudio)
+  )
+library(tidyverse)
+theme_set(theme_bw())
+```
+
+## Overview
+
+### Question
+
+What makes people cancel their hotel bookings? Can we predict when a booking is cancelled?
+
+## Prior Work
+
+### Summary and critique of prior work
+
+[EDA & Predictive Analysis for Hotel Booking Data, Anshul](https://www.kaggle.com/code/anshularya/eda-predictive-analysis-for-hotel-booking-data/notebook)
+
+This EDA concludes with a prediction of booking cancellation. Prior to this, the report looks at the preferred location of the hotels, then goes on to see the cancellation by type of hotel. The data scientist learns when cancellation is more likely to happen
+
+What did they do well that is inspiring?
+
+The variety of graphs to understand different aspects of this data is inspiring
+
+What could they improve on or explore further?
+
+More notes and explanation of why certain analysis is taking place would be helpful especially to less experienced data scientists
+
+Do you trust their results? Why or why not?
+
+Yes. This is well thought out, despite the lack of commentary, I think this is good due to the above stated inspiring points
+
+[Hotel Booking EDA, Harsha Palnitkar](https://www.kaggle.com/code/harshapalnitkar/hotel-booking-eda/notebook)
+This individual looks at the different types of customers, the most common month, the most preferred booking ammenity chosen, among other things. Market segments and cancelled bookings are also analyzed.
+What did they do well that is inspiring?
+
+The precision and concision here is impressive
+
+This is an EDA performed using Python and it is interesting to see the slight differences
+
+What could they improve on or explore further?
+
+The individual does not provide an explicit conclusion from all of this analysis and so it feels a little abrupt.
+
+[hotel_booking, Ahmed Elgebaly](https://www.kaggle.com/code/ahmedsafwatgb20/hotel-booking/notebook)
+This data scientist looks into different aspects of booking and draws clear and distinct conclusions. Along with this, recommendations are given from the findings. The EDA looks into booking trends in order to provide promotional suggestions.
+
+What did they do well that is inspiring?
+Clear connections are made with good conclusions and recommendations
+I think this might be the best one as suggestions are also provided with each analysis that is done!
+
+What could they improve on or explore further?
+Other things that may lead to cancellation
+
+[Hotel Bookings- Basic EDA, Azmain Morshed](https://www.kaggle.com/code/azmainmorshed/hotel-bookings-basic-eda/notebook)
+
+[EDA of bookings and ML to predict cancelations, Marcus Wingen](https://www.kaggle.com/code/marcuswingen/eda-of-bookings-and-ml-to-predict-cancelations)
+
+[Hotel Booking Prediction (99.5% acc), Nitesh Yadav](https://www.kaggle.com/code/niteshyadav3103/hotel-booking-prediction-99-5-acc)
+
+### How this project extends prior work
+
+## Approach
+
+### Problem Description
+
+We will look into most of the analysis that is performed above, but as seen, it is rather vague/no solid conclusions are drawn that answer our specific questions. What makes people cancel bookings? Are there any factors that lead to cancellation, if so, what could they be? Is there a trend between the times that bookings are cancelled? What can be done to avoid cancellation? From this, we will see if we can predict future cancellations caused by different factors, and the likelihood of the cancellations.
+
+### Data
+
+The original dataset contains 119,390 observations and each observation represents 32 variables:
+Resort or City Hotel
+Is the reservation cancelled?
+Number of days that elapsed between the entering date of the booking into the PMS and the arrival date
+Arrival year
+Arrival month
+Arrival week number
+Arrival day
+Number of weekend nights spent/booked
+Number of week nights spent/booked
+Number of adults
+Number of children
+Number of babies
+Type of meal in package
+Country of booking
+Distribution channel
+Previous cancellations
+Previous reservations not cancelled
+Reserved room type
+Assigned room type
+Booking change
+Deposit type
+Agent
+Company
+Days in waiting list
+Customer type
+Adr (?)
+Required car parking spaces
+Total special requests
+Reservation status
+Reservation status date
+
+
+#### Provenance
+
+The data was downloaded from Kaggle.
+As seen from the Kaggle project:
+"The data is originally from the article Hotel Booking Demand Datasets, written by Nuno Antonio, Ana Almeida, and Luis Nunes for Data in Brief, Volume 22, February 2019.
+
+The data was downloaded and cleaned by Thomas Mock and Antoine Bichat for #TidyTuesday during the week of February 11th, 2020."
+
+#### Structure
+
+#### Appropriateness for task
+
+This is a good data source because it has so many variables that make it easy to look into different aspects
+
+### Modeling Question and Approach
+
+## Exploratory Data Analysis
+
+```{r}
+hotel_bookings <- read.csv("data/hotel_bookings.csv")
+```
+
+Which months are the busiest?
+```{r}
+#hotel_bookings |>
+#  ggplot() +
+#  aes(x = arrival_date_month, y = adr) +
+#  geom_line(aes(color = hotel))
+  #scale_fill_viridis_d() +
+  #theme_minimal()
+```
+
+```{r}
+hotel_bookings$arrival_date_month = factor(hotel_bookings$arrival_date_month, levels = month.name)
+
+ggplot(hotel_bookings, aes(x=arrival_date_month, fill = hotel)) +
+  geom_bar(position = 'dodge') +
+  ylab('Number of Hotel Bookings ') +
+  xlab('Month')+
+  ggtitle('Average Number of Hotel Bookings per Month') +
+  labs(fill='Hotel') +
+  theme_minimal()
+
+```
+
+The busiest month of hotel bookings for both hotels is August, while the least busiest month is January.
+
+```{r}
+checkout = hotel_bookings  %>% filter(reservation_status == 'Check-Out') 
+dim(checkout)
+
+ggplot(checkout, aes(customer_type, fill=hotel)) +
+  geom_bar(stat='count', position=position_dodge()) +
+  ylab('Count') +
+  xlab('Booking type') +
+  ggtitle('Type of Booking by Different Hotel Type') +
+  labs(fill='Hotel type') +
+  theme_minimal()
+```
+
+The booking type for both hotels are similar, with transient bookings having a much higher number compared to other booking types.
+
+```{r}
+hotel_bookings |>
+  ggplot() +
+  aes(lead_time)+ 
+  geom_histogram(binwidth = 0.8,col='turquoise' )+ 
+  facet_wrap(~ is_canceled)
+```
+
+It appears that there is a similar pattern between bookings cancelled and not cancelled, so lead time may not be a useful predictor variable to predict booking cancellations.
+
+### Individual Variables
+
+
+### Combinations of Variables
+
+
+## Modeling
+## Summary
+### Discussion of Findings
+This section must compare two different approaches (models, representation choices, evaluation methods, or whatever you have chosen).
+### Limitations and Social / Ethical Considerations
+### Future Directions

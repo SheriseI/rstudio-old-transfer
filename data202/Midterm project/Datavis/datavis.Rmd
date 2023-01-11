@@ -1,0 +1,168 @@
+---
+title: "Midterm Project Milestone: Rough-Draft Replication"
+author: "Sherise Immanuela & Tanya Nyamwiwa"
+output:
+  html_document:
+    code_download: true
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+## Overview
+We are interested in the relationship between the S&P 500 stock volume and price because it is generally believed that trading volume is a good indicator of the market's trend. We chose to replicate a plot from the following article:
+[Opinion: Time to worry? Trading volume is rising when stocks are
+falling](https://www.marketwatch.com/story/time-to-worry-trading-volume-is-rising-when-stocks-are-falling-2018-04-27)
+
+```{r original-plot}
+knitr::include_graphics("https://ei.marketwatch.com/Multimedia/2018/04/26/Photos/ZG/MW-GI064_volume_20180426124007_ZG.jpg?uuid=7ac8348a-4970-11e8-8e97-ac162d7bc1f7")
+```
+
+Claim:
+
+> Trading volume is not a good indicator to make conclusions about the
+> market's trend.
+
+## Design
+
+The visualization the author chose was a bar graph and
+line graph combined. The x-axis represents days in 2018 (January-April). 
+The left y-axis shows the S&P trading volume in billions. The right y-axis 
+shows the S&P 500's price.
+
+First, they made use of color. The line graph for the S&P 500 price is in blue, 
+while the bar graph for the S&P 500 volume is in red. Second, they used lines to separate 
+the whole plot in 4 (to separate each month). Third, they "freed" the y-axis on both sides to
+represent two different scales.
+
+For at least one of these variables, describe what makes that choice
+appropriate or inappropriate. We think the slightly transparent lines
+are appropriate so we can see more clearly the difference of movements
+between the months.
+
+First, we think that the use of free y-axis scales are effective, 
+because we can see the proportions of the two graphs accurately. We can see 
+the distribution of the two graphs easily. One thing we think can be done more effectively 
+is adding points on the line graph so we can see the actual change in price more clearly. 
+Because the binwidth days are very tight, it would be better if we can "zoom in" on
+the line graph.
+
+## Data
+
+### Data Overview
+
+We couldn't find the data from the source the article uses. However,
+because are data is made readily available on other sites, we are able
+to find the same data they used.
+
+The author of the article sourced the data from FactSet. However, the
+original data simply comes from S&P/the stock market.
+
+Direct URL:
+
+[Yahoo Finance Historical Data of the S&P
+500](https://finance.yahoo.com/quote/%5EGSPC/history?p=%5EGSPC)
+
+The S&P 500 is publicly published data, so we can use it however we
+want.
+
+We can directly source the data from the S&P 500 website. However, many
+trusted sources like Yahoo Finance provide the same exact data.
+
+As mentioned above, the data just comes from the S&P 500. The article is
+written by Mark Hulbert and published on MarketWatch.
+
+As far as we know, no processing have been done to it.
+
+From Investopedia, we know that the S&P 500 price is calculated by
+taking "the number of outstanding shares of each company and multiplies
+that number by the company's current share price, or market value."
+
+### Data Details
+
+```{r load-data}
+sp_fiveyears <- read_csv("data/all_stocks_5yr.csv")
+
+```
+
+```{r}
+glimpse(sp_fiveyears)
+```
+
+For five years of S&P 500 data (price and volume), the data has 7
+columns with the variables `date`, `open`, `high`, `low`, `close`,
+`volume`, and `Name`.
+
+A single row represents the open, close, highest, and lowest price, and
+volume of one stock in the S&P 500 in a single day.
+
+There are `r nrow(sp_fiveyears)` rows.
+
+### Wrangling
+
+🚧 Describe, at a broad level, what you need to do to the data to make it
+into the form you need for the plot. (e.g., what data types need fixing,
+whether you need to pivot, what filtering is needed, etc.)
+
+🚧 Add code blocks, with appropriate names, for wrangling steps.
+**Explain the *why* for any choices you make (like filtering data).**
+
+```{r}
+sp2018 <- read_csv("data/2018spdata.csv")
+```
+
+
+## Replication
+
+🚧 Include your replication, along with all code needed. 🚧 Briefly
+describe any difficulties you encountered, both those you overcame and
+those you still have not. (It's ok to not have a perfect graph here. If
+the essential structure is there, don't worry if the details are a bit
+different. Focus your attention on making an interesting and polished
+alternative design.) 🚧
+
+```{r}
+sp2018 %>%
+  ggplot() +
+  aes(y = close, x = date) +
+  scale_x_continuous(breaks=seq(1, 2, 3))
+  geom_line()+
+  scale_fill_viridis_d()
+```
+
+## Alternatives
+
+🚧 Describe at least two alternative design choices that could be made in
+visualizing your data. For each design, include the following sections
+
+### Alternative 1: Design
+
+🚧 What choice did the original visual make? (e.g., to use a particular
+aesthetic mapping or glyph) 🚧 What choice does your alternative design
+make instead? (It should be a reasonable choice, but it doesn't have to
+be an improvement.) 🚧 How does that change affect how the visual
+supports the original claim? Can your redesign now support some
+different claim?
+
+### Implementation
+
+🚧 Make a solid attempt to implement your best alternative design. If
+creating it using ggplot/plotly/etc is too challenging, you may include
+a high-fidelity sketch of what the plot would look like (using
+PowerPoint, a vector graphics tool, or a good-quality scan of a paper or
+whiteboard), along with a clear description of what you'd need to figure
+out in order to produce it with code.
+
+## Summary
+
+🚧 Now that you've gone through the whole process, how has your
+understanding of, and belief in, the original article's claim changed? 🚧
+How faithful was your replication? 🚧 Compare your original and
+alternative designs. Which is best for what purpose? 🚧 What follow-up
+questions and ideas do you have about the data or visualization you
+worked with? 🚧 How do you feel about this whole experience?

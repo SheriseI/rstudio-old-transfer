@@ -1,0 +1,221 @@
+---
+title: "DATA202 Midterm Project"
+author: "Sherise Immanuela & Tanya Nyamwiwa"
+output:
+  html_document:
+    code_download: true
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(patchwork)
+```
+
+## Overview
+We are interested in the relationship between the S&P 500 stock volume and price because it is generally believed that trading volume is a good indicator of stock price, and vice versa. We chose to replicate a plot from the following article:
+[Opinion: Time to worry? Trading volume is rising when stocks are
+falling](https://www.marketwatch.com/story/time-to-worry-trading-volume-is-rising-when-stocks-are-falling-2018-04-27)
+
+```{r original-plot}
+knitr::include_graphics("https://ei.marketwatch.com/Multimedia/2018/04/26/Photos/ZG/MW-GI064_volume_20180426124007_ZG.jpg?uuid=7ac8348a-4970-11e8-8e97-ac162d7bc1f7")
+```
+
+Claim:
+
+> The movements of price and volume of the S&P 500 tend to happen at the same time rather than one being consistently before or after the other. In other words, neither price nor volume is a leading or lagging indicator of the other. 
+
+## Design
+
+The visualization the author chose was a bar graph and
+line graph combined. The x-axis represents days in 2018 (January-April). 
+The left y-axis shows the S&P trading volume in billions. The right y-axis 
+shows the S&P 500's price.
+
+First, they made use of color. The line graph for the S&P 500 price is in blue, 
+while the bar graph for the S&P 500 volume is in red. Second, they used lines to separate 
+the whole plot in 4 (to separate each month). Third, they "freed" the y-axis on both sides to
+represent two different scales.
+
+For at least one of these variables, describe what makes that choice
+appropriate or inappropriate. We think the slightly transparent lines
+are appropriate so we can see more clearly the difference of movements
+between the months.
+
+First, we think that the use of free y-axis scales are effective, 
+because we can see the proportions of the two graphs accurately. We can see 
+the distribution of the two graphs easily. One thing we think can be done more effectively 
+is adding points on the line graph so we can see the actual change in price more clearly. 
+Because the width of the column bars are very tight, it would be better if we can "zoom in" on
+the line graph.
+
+## Data
+
+### Data Overview
+
+We couldn't find the data from the source the article uses. However,
+because are data is made readily available on other sites, we are able
+to find the same data they used.
+
+The author of the article sourced the data from FactSet. However, the
+original data simply comes from S&P/the stock market.
+
+Direct URL:
+
+[Yahoo Finance Historical Data of the S&P
+500](https://finance.yahoo.com/quote/%5EGSPC/history?p=%5EGSPC)
+
+The S&P 500 is publicly published data, so we can use it however we
+want.
+
+We can directly source the data from the S&P 500 website. However, many
+trusted sources like Yahoo Finance provide the same exact data.
+
+As mentioned above, the data just comes from the S&P 500. The article is
+written by Mark Hulbert and published on MarketWatch.
+
+As far as we know, no processing have been done to it.
+
+From Investopedia, we know that the S&P 500 price is calculated by
+taking "the number of outstanding shares of each company and multiplies
+that number by the company's current share price, or market value."
+
+### Data Details
+
+```{r load-data}
+sp_fiveyears <- read_csv("data/all_stocks_5yr.csv")
+
+```
+
+```{r}
+glimpse(sp_fiveyears)
+```
+
+For five years of S&P 500 data (price and volume), the data has 7
+columns with the variables `date`, `open`, `high`, `low`, `close`,
+`volume`, and `Name`.
+
+A single row represents the open, close, highest, and lowest price, and
+volume of one stock in the S&P 500 in a single day.
+
+There are `r nrow(sp_fiveyears)` rows.
+
+### Wrangling
+
+- We filtered the dataset to include only data from January to mid-April. 
+- We tried fixing the format of the date (previously qualitative e.g., 22-Jan-2018) in R, 
+but we didn't succeed. So we formatted it in Excel to a quantitative format (e.g., 2018-01-22) and reuploaded it as a CSV in R.
+
+```{r read-in-data}
+sp2018 <- read_csv("data/2018spdata.csv")
+```
+
+
+## Replication
+
+```{r filter-Jan-April}
+spToApril <- sp2018 %>% 
+  filter(date <= "2018-04-15")
+```
+
+
+The code below has been taken from
+[this website](https://r-graph-gallery.com/line-chart-dual-Y-axis-ggplot2.html)
+We also made use of 
+[this resource](https://thepracticalr.wordpress.com/2016/08/30/2-y-axis-plotting/)
+
+
+```{r combinePlots}
+#we will multiply the second axis by 434 because the maximum value is a little under 2600, while the first axis is a little under 6 (in billions)
+spToApril %>% 
+  mutate(volume = volume/1000000000) %>%
+  ggplot() +
+  geom_col(aes(x = date, y = volume), fill = "firebrick1") +
+  geom_line(aes(x = date, y = close/483), color = "skyblue1") +
+  scale_y_continuous(
+    name = "Volume",
+    sec.axis = sec_axis(trans = ~.*483, name = "S&P 500") #trans multiply should be one that adjusts the 2 axes to be multiples of each other, but we could not figure out why it was not working
+  ) +
+  theme(axis.title.x=element_blank())
+
+```
+
+
+Note: We weren't able to figure out how to stack these two plots together like the original plot. 
+We also haven't made the same scales as the original plot.
+Our graph representing volume has gaps for weekends/holidays, but the original dataset doesn't have gaps.
+
+## Alternatives
+
+### Alternative 1: Design
+
+The original visual combined a column graph and line graph in the same plot. 
+In our first alternative design idea, we want to do a similar graph but facet it by month.
+Our design would support a similar claim, however it would be more focused on seeing the trend difference between months.
+We will make use of the patchwork package to display 2 charts (price and volume) side by side
+The instructions are given [here](https://r-graph-gallery.com/line-chart-dual-Y-axis-ggplot2.html)
+
+### Alternative 2: Design
+The original visual used a line graph to represent price, and we had to pick one variable (`close`) to use.
+Our second alternative design idea is using a candlestick chart where we can use all 4 variables in our dataset related to price (`low`, `high`, `open`, `close`).
+
+### Implementation
+
+```{r linePlot}
+p1 <- spToApril |>
+  ggplot() +
+  aes(y = close, x = date) +
+  geom_line(color = "skyblue1") +
+  scale_fill_viridis_d() +
+  theme(axis.title.x=element_blank())
+```
+
+```{r colPlot}
+p2 <- spToApril %>% 
+  mutate(volume = volume/1000000000) %>% 
+  ggplot() +
+  aes(x = date, y = volume) +
+  geom_col(fill = "firebrick1")  +
+  theme(axis.title.x=element_blank())
+```
+
+```{r sideByside}
+(p1 / p2) +
+  labs(
+    title = "Does volume follow trend?",
+    subtitle = "S&P 500 price and volume so far in 2018"
+  ) 
+```
+
+```{r facetPlot}
+spToApril %>%
+  mutate(volume = volume/1000000000) %>%
+  ggplot() +
+  geom_col(aes(x = date, y = volume), fill = "firebrick1") +
+  geom_line(aes(x = date, y = close/483), color = "skyblue1") +
+  scale_y_continuous(
+    name = "Volume",
+    sec.axis = sec_axis(trans = ~.*483, name = "S&P 500")
+  ) +
+  facet_wrap(~month, strip.position="bottom") +
+  theme(axis.title.x=element_blank())
+```
+
+## Summary
+We understood more clearly what the original article's claim is. We simply thought it was intuitive for market price and market volume to have an inverse relationship. 
+However, we learnt that we had to look at how volume and price move together. In other words, the movement of price doesn't cause a movement of volume, and vice versa. Both are caused by some underlying factor.
+
+We thought the original graph made it hard to compare the line graph and bar graph together, 
+and simultaneously understand the volume and the corresponding graph. More specifically, it's hard
+to look at the two graphs and make a conclusion about their relationship or possible correlation between the two. 
+
+We tried making the replication as similar as possible. We used the same colors, axes, and nearly the same scale. Our data, however, had a different volume upper limit, which is 6 billion. The original plot had data that peaked at 4 billion. Additionally, our line graph did not show steep changes as illustrated in the original plot, and we weren't able to make it different.
+
+Our first alternative design is better for seeing the price and volume trend by month. 
+Our second alternative design is better for a deeper understanding of the change in price, since we can see the open, close, low, and high numbers. However, that would be hard to interpret for viewers who are not familiar with investing terms.  
+
+We are curious about what other variables or data we could use to explore what causes either price or volume of the S&P 500 to change. We definitely learned a lot through this project. However, we feel like we could've explored the comparisons in more depth. Due to time constraints and the difficult nature of the original graph, we weren't able to do that. We think it was a great learning experience understanding how to work with the dataset from "scratch". 
+

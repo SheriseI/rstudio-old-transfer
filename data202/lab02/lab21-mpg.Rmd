@@ -1,0 +1,103 @@
+---
+title: "Lab 2.1 - The MPG Dataset<sup>*</sup>"
+author: "Sherise Immanuela"
+date: "Fall 2022"
+output:
+  html_document: default
+editor_options:
+  markdown:
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+In this document, we explore the MPG dataset provided in the TidyVerse
+package. It will follow the model of the lab 1.2 exploration of the
+Seattle Pets dataset.
+
+## Loading the MPG Dataset
+
+```{r}
+library(tidyverse)
+glimpse(mpg)
+mpg
+head(mpg, n = 1)
+```
+
+-   This dataset has 234 rows and 11 columns.
+-   ([MPG dataset
+    reference](https://ggplot2.tidyverse.org/reference/mpg.html)).
+
+## Reading and Writing Files
+
+The MPG dataset is pre-loaded in the TidyVerse package, but we could
+save it to a file and reload it from there.
+
+We can now read the MPG dataset back in from the file.
+
+```{r, message=FALSE}
+write_csv(mpg,'data/mpgdataset.csv')
+```
+
+```{r}
+mpgdata <- read_csv('data/mpgdataset.csv')
+```
+
+## Including Images
+
+RMarkdown allows us to include images.
+
+![](https://cs.calvin.edu/courses/info/601/kvlinden/kvlinden/resources/images/rmarkdown-logo.png){width="130"}
+
+## Using Equations and Inline Code
+
+RMarkdown also allows us to include equations and inline code
+computations. For example, Einstein's famous equation, $e = mc^2$, tells
+us that given the speed of light (29979245800 cm/second), the energy
+stored in a mass of 1 gram is: `r 1 * 29979245800**2`. (Yep, that's a
+pretty big number.)
+
+The average city mpg is `r mean(mpg$cty)` The average highway mpg
+`r mean(mpg$hwy)`
+
+## Using the Intermediate Data Types
+
+This document has already includes Tibbles (e.g., `mpg`), a particularly
+useful version of the standard data frame used to store datasets. The
+other data types we'll use in the course include Dates and Factors.
+
+A *date* is a special type used to represent date-times. For example, it
+is currently `r lubridate::now()`. Dates can be manipulated using the
+`lubridate` package.
+
+```{r}
+lubridate::make_date(year = mpg$year)
+```
+
+A *factor* is a special type of *vector* used to represent categorical
+data values. For example, though the drive variable in the MPG dataset
+is represented as a character, it's probably best seen as a value from a
+short list of possible categories: 'f', '4', ...
+
+```{r}
+as.factor(mpg$drv)
+```
+
+The variables stand for wheel drive types.
+
+## Exploring the Data
+
+<hr>
+
+```{r}
+mpg%>%
+  count(class, sort = TRUE)
+```
+
+The most popular car class in the dataset is an SUV, while the least
+popular is a 2 seater.
+
+<sup>\*</sup>Exercise based on [Data Science in a
+Box](https://datasciencebox.org/)

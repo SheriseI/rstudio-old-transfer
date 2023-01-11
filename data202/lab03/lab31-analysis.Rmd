@@ -1,0 +1,22 @@
+---
+title: "Lab 3.1 - Visualization Analysis"
+author: "Sherise Immanuela"
+date: "Fall 2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This document presents an analysis of an existing data visualization.
+
+## Analyzing Wikipedia's US Federal Budget Visualization
+
+Wikipedia provides a visualization of the [US Federal budget](https://en.wikipedia.org/wiki/United_States_federal_budget) each year. Here's this year's budget:
+
+[![2020 US Federal Budget (Wikipedia)](https://cs.calvin.edu/courses/info/601/resources/images/2020_US_Federal_Budget_Infographic.png){width="235"}](https://upload.wikimedia.org/wikipedia/commons/f/fb/2020_US_Federal_Budget_Infographic.png)
+
+It seems that the purpose of the graph is to give a visualization of how the U.S. federal budget was used in 2020. What may be questioned is the comparison of outlays and revenues, and whether the government had a surplus or deficit in their budget that year. The audience is primarily U.S. citizens, and whoever has interest/concern with how the US government used the federal budget. The creator of this graph is the Congressional Budget Office (CBO), which produces independent analyses of budgetary and economic issues to support the Congressional budget process (<https://www.cbo.gov/about/overview>).
+
+Based on Yau's Taxonomy, we can analyze this visualization using four basic elements: visual cues, coordinate systems, scale, and context. Within the visual cues element, the cues that stood out for me the most from the graph are color and shade. The Outlays graph is colored with shades of blue, while the Revenues graph is colored with shades of green. The scale they used (if any) is not ordered, because they used a pie chart to show proportions of categorical variables with number values assigned to them. Lastly, I think the creator did well in the context element because there's lots of explanations of what's being told in the graph.

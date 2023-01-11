@@ -1,0 +1,240 @@
+---
+title: "DATA 202 Homework 7"
+author: "Sherise Immanuela"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_download: true
+editor_options: 
+  markdown: 
+    wrap: sentence
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(tidymodels)
+library(rpart.plot)
+theme_set(theme_bw())
+```
+
+## Getting Started
+
+```{r data}
+daily_rides <- readRDS(url("https://cs.calvin.edu/courses/info/602/06ensembles/hw/bikeshare-day.rds"))
+```
+
+## Train-Test Split
+
+```{r}
+rides_2011 <- daily_rides %>% filter(year == 2011)
+rides_2012 <- daily_rides %>% filter(year == 2012)
+```
+
+```{r}
+set.seed(1234)
+rides_split <- initial_split(rides_2011, prop = 3/4)
+train <- training(rides_split)
+test <- testing(rides_split)
+```
+
+```{r}
+rides_2011_with_split_marked <- bind_rows(
+  train = train,
+  test = test,
+  .id = "split"
+) %>% mutate(split = as_factor(split)) %>% 
+  arrange(date)
+rides_2011_with_split_marked %>% head() %>% knitr::kable()
+```
+
+## Fitting Models
+
+```{r}
+model_formula <- casual ~ temp + workingday + month
+# Come back and try this one later:
+# model_formula <- casual ~ temp + workingday + month + day_since_stay
+```
+
+```{r}
+linreg_model <- fit(
+  linear_reg(),
+  model_formula,
+  data = train
+)
+```
+
+### Exercise 1
+
+```{r}
+linreg_model %>%
+  tidy() %>%
+  select(term, estimate)
+```
+
+For every additional degree C, the model predicts 490 additional rides."
+
+### Predictions
+
+```{r}
+augment(linreg_model, train) %>% 
+  ggplot(aes(x = date, y = casual, color = workingday)) +
+  geom_point() +
+  geom_line(aes(y = .pred))
+```
+
+### Exercise 2
+
+The prediction is not a straight line because we're plotting time (x) against our response variable (`casual`).
+If the model is changed to casual\~temp, and temp is plotted on the x-axis against `casual`, we would get a straight line.
+
+### Observed by Predicted
+
+```{r}
+augment(linreg_model, new_data = train) %>% 
+  ggplot(aes(x = casual, y = .pred, color = workingday)) +
+  geom_abline() +
+  geom_point(alpha = .5) +
+  coord_obs_pred()
+```
+
+### Exercise 3
+
+The model typically predicts too high when the number of casual riders is more than 1,000.
+On the contrary, the model typically predicts too low when the number of casual riders (more specifically on the weekend), is less than 1,000.
+
+### Quantify Errors
+
+```{r}
+augment(linreg_model, rides_2011_with_split_marked) %>% 
+  group_by(split) %>% 
+  #summarize(mae = mean(abs(casual - .pred)))
+  mae(truth = casual, estimate = .pred)
+```
+
+### Exercise 4
+
+On days that the model had not seen, the predicted number of rides was higher than days in the training model.
+
+## Decision Tree Regression
+
+```{r}
+dtree_model <- fit(
+  decision_tree(mode = "regression"),
+  model_formula, data = train)
+```
+
+```{r}
+dtree_model %>%
+  extract_fit_engine() %>% 
+  rpart.plot(roundint = FALSE, digits = 3, type = 4)
+```
+
+### Exercise 5
+
+If we select Saturday, the model would first look at the temperature that day.
+It will then see if the day is a weekday or weekend (in this case, weekend).
+After that, it will see what month the Saturday is in.
+For instance, if it's a Saturday in December, the model will predict that the number of casual riders is 323.
+
+### Exercise 6
+
+```{r}
+augment(dtree_model, new_data = train) %>% 
+  ggplot(aes(x = casual, y = .pred, color = workingday)) +
+  geom_abline() +
+  geom_point(alpha = .5) +
+  coord_obs_pred()
+```
+
+### Exercise 7
+
+```{r}
+augment(dtree_model, rides_2011_with_split_marked) %>% 
+  group_by(split) %>% 
+  #summarize(mae = mean(abs(casual - .pred)))
+  mae(truth = casual, estimate = .pred)
+```
+
+The decision tree model performed better than the linear regression model because of the lower MAE.
+
+## Ensembles
+
+```{r}
+rf_model <-
+  rand_forest(mode = "regression") %>%
+  fit(model_formula, data = train)
+boost_model <- fit(
+  boost_tree(mode = "regression"),
+  model_formula, data = train)
+```
+
+### Exercise 8
+
+```{r}
+augment(rf_model, new_data = train) %>% 
+  ggplot(aes(x = casual, y = .pred, color = workingday)) +
+  geom_abline() +
+  geom_point(alpha = .5) +
+  coord_obs_pred()
+```
+
+```{r}
+augment(boost_model, new_data = train) %>% 
+  ggplot(aes(x = casual, y = .pred, color = workingday)) +
+  geom_abline() +
+  geom_point(alpha = .5) +
+  coord_obs_pred()
+```
+
+The points plotted on the boosted tree closely fits the line, unlike the other models that have more scattered points.
+
+### Exercise 9
+
+```{r}
+eval_dataset <- rides_2011_with_split_marked
+
+all_predictions <- bind_rows(
+  linreg_model = augment(linreg_model, new_data = eval_dataset),
+  dtree_model = augment(dtree_model, new_data = eval_dataset),
+  rf_model = augment(rf_model, new_data = eval_dataset),
+  boost_model = augment(boost_model, eval_dataset),
+  .id = "model"
+) %>% mutate(model = as_factor(model))
+```
+
+```{r}
+all_predictions %>% 
+  group_by(model, split) %>% 
+  mae(truth = casual, estimate = .pred) %>% 
+  mutate(mae = .estimate) %>% 
+  ggplot(aes(x = model, y = mae, fill = split)) +
+    geom_col(position = "dodge")
+```
+
+-   The model that performs best on training set data is by far the boost model.
+
+-   The model that performs best on unseen data is the random forest model.
+
+-   The model that underfit is the linear regression model.
+
+-   The model that significantly overfit is the boost model.
+
+-   The random forest model is quite balanced.
+
+### Exercise 10
+
+```{r}
+daily_rides %>% ggplot(aes(x = casual, y = year)) + geom_boxplot()
+```
+
+The distribution is quite similar, but in 2012, the distribution got wider. It also shifted because the number of casual riders increased.
+
+### Exercise 11
+
+The increase in error might be from the quite significant increase of riders in 2012 compared to 2011.
+
+
+
+
+

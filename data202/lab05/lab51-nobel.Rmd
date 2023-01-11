@@ -1,0 +1,113 @@
+---
+title: "Lab 5.1 - Nobel Laureates"
+author: "Sherise Immanuela"
+date: "Fall 2022"
+output:
+  html_document:
+    code_download: true
+---
+
+```{r load-packages, message=FALSE}
+library(tidyverse) 
+```
+
+This analysis explores the data used by P. Aldhous in [this Buzzfeed article](https://www.buzzfeednews.com/article/peteraldhous/immigration-and-science). The article claims that one key factor in the US's leadership in science and technology is immigration because while most living Nobel laureates in the sciences are based in the US, many of them were born in other countries.
+
+## The Dataset
+```{r}
+nobel <- read_csv("data/nobel.csv")
+```
+
+The dataset has 935 observations and 26 variables. Each observation represents a nobel prize winner. Each row tells us their `firstname`, `surname`, `year the prize was won`, `which city and country`, `where the laureate was born`, `when the laureate was born and died`, and other things in the following list:
+
+- `id`: ID number
+- `firstname`: First name of laureate
+- `surname`: Surname 
+- `year`: Year prize won
+- `category`: Category of prize
+- `affiliation`: Affiliation of laureate
+- `city`: City of laureate in prize year
+- `country`: Country of laureate in prize year
+- `born_date`: Birth date of laureate
+- `died_date`: Death date of laureate
+- `gender`: Gender of laureate
+- `born_city`: City where laureate was born
+- `born_country`: Country where laureate was born
+- `born_country_code`: Code of country where laureate was born
+- `died_city`: City where laureate died
+- `died_country`: Country where laureate died
+- `died_country_code`: Code of country where laureate died
+- `overall_motivation`: Overall motivation for recognition
+- `share`: Number of other winners award is shared with
+- `motivation`: Motivation for recognition
+
+In a few cases the name of the city/country changed after laureate was given (e.g. in 1975 Bosnia and Herzegovina was part of the Socialist Federative Republic of Yugoslavia). In these cases the variables below reflect a different name than their counterparts without the suffix `_original`.
+
+- `born_country_original`: Original country where laureate was born
+- `born_city_original`: Original city where laureate was born
+- `died_country_original`: Original country where laureate died
+- `died_city_original`: Original city where laureate died
+- `city_original`: Original city where laureate lived at the time of winning the award
+- `country_original`: Original country where laureate lived at the time of winning the award
+
+## Cleansing the Data
+
+```{r}
+nobel_living <- nobel %>% 
+  filter(!is.na(country) & gender != "org" & is.na(died_date))
+```
+
+## Determining Where Nobel Laureates Lived
+
+```{r eval = FALSE}
+  mutate(
+    nobel, country_us = if_else(country == "USA", "USA", "Other")
+  )
+```
+
+```{r}
+nobel_living_science <- nobel_living %>% 
+  mutate(
+    country_us = if_else(country == "USA", "USA", "Other"),
+
+#Add a new variable for where they were born
+    born_country_us = if_else(born_country == "USA", "USA", "Other")) %>% 
+  filter(category %in% c("Physics", "Medicine", "Chemistry", "Economics" ))
+```
+
+![prizes by current country](images/nobel1.png)
+```{r faceted bar plot}
+ggplot(data = nobel_living_science) +
+  geom_bar(mapping = aes( y = country_us))+
+  facet_wrap(category ~.) +
+  labs ( x = "Number of Nobel Laureates",
+         y = "Country they lived in when winning"
+         )
+```
+## Determining Where Nobel Laureates Were Born
+
+```{r}
+ggplot(data = nobel_living_science) +
+  geom_bar(mapping = aes( y = country_us, fill = born_country_us,))+
+  facet_wrap(category ~.) +
+  labs ( x = "Number of Nobel Laureates",
+         y = "Country where price won"
+         )
+```
+
+![prizes by country of origin](images/nobel2.png)
+The data show that very few Nobel prize winners who won in other countries emigrated there from the US. Conversely, however, the data show that many US prize winners were born in other countries, at least for fields other than Economics in which the majority of winners were not US-born.
+
+## Determining Where Immigrant Nobel Laureates Were Born
+
+![country of origin of immigrant winners](images/nobel3.png)
+```{r}
+nobel_living_science |>
+  filter(country_us == "USA" & born_country != "USA") |>
+  group_by(born_country) |>
+  count(born_country, sort=TRUE)
+```
+
+## Recreating the Buzzfeed Visualizations [OPTIONAL]
+
+The plots in the Buzzfeed article are called waffle plots. You can find the code used for making these plots in Buzzfeed's GitHub repo (yes, they have one!) [here](https://buzzfeednews.github.io/2017-01-immigration-and-science/). You're not expected to recreate them as part of your assignment, but you're welcome to do so for fun!

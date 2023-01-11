@@ -1,0 +1,382 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={Lab 2.1 - The MPG Dataset*},
+  pdfauthor={Sherise Immanuela},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Lab 2.1 - The MPG Dataset*}
+\author{Sherise Immanuela}
+\date{Fall 2022}
+
+\begin{document}
+\maketitle
+
+In this document, we explore the MPG dataset provided in the TidyVerse
+package. It will follow the model of the lab 1.2 exploration of the
+Seattle Pets dataset.
+
+\hypertarget{loading-the-mpg-dataset}{%
+\subsection{Loading the MPG Dataset}\label{loading-the-mpg-dataset}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(tidyverse)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## -- Attaching packages --------------------------------------- tidyverse 1.3.1 --
+\end{verbatim}
+
+\begin{verbatim}
+## v ggplot2 3.3.5     v purrr   0.3.4
+## v tibble  3.1.6     v dplyr   1.0.9
+## v tidyr   1.2.0     v stringr 1.4.0
+## v readr   2.1.2     v forcats 0.5.1
+\end{verbatim}
+
+\begin{verbatim}
+## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{glimpse}\NormalTok{(mpg)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Rows: 234
+## Columns: 11
+## $ manufacturer <chr> "audi", "audi", "audi", "audi", "audi", "audi", "audi", "~
+## $ model        <chr> "a4", "a4", "a4", "a4", "a4", "a4", "a4", "a4 quattro", "~
+## $ displ        <dbl> 1.8, 1.8, 2.0, 2.0, 2.8, 2.8, 3.1, 1.8, 1.8, 2.0, 2.0, 2.~
+## $ year         <int> 1999, 1999, 2008, 2008, 1999, 1999, 2008, 1999, 1999, 200~
+## $ cyl          <int> 4, 4, 4, 4, 6, 6, 6, 4, 4, 4, 4, 6, 6, 6, 6, 6, 6, 8, 8, ~
+## $ trans        <chr> "auto(l5)", "manual(m5)", "manual(m6)", "auto(av)", "auto~
+## $ drv          <chr> "f", "f", "f", "f", "f", "f", "f", "4", "4", "4", "4", "4~
+## $ cty          <int> 18, 21, 20, 21, 16, 18, 18, 18, 16, 20, 19, 15, 17, 17, 1~
+## $ hwy          <int> 29, 29, 31, 30, 26, 26, 27, 26, 25, 28, 27, 25, 25, 25, 2~
+## $ fl           <chr> "p", "p", "p", "p", "p", "p", "p", "p", "p", "p", "p", "p~
+## $ class        <chr> "compact", "compact", "compact", "compact", "compact", "c~
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mpg}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 234 x 11
+##    manufacturer model      displ  year   cyl trans drv     cty   hwy fl    class
+##    <chr>        <chr>      <dbl> <int> <int> <chr> <chr> <int> <int> <chr> <chr>
+##  1 audi         a4           1.8  1999     4 auto~ f        18    29 p     comp~
+##  2 audi         a4           1.8  1999     4 manu~ f        21    29 p     comp~
+##  3 audi         a4           2    2008     4 manu~ f        20    31 p     comp~
+##  4 audi         a4           2    2008     4 auto~ f        21    30 p     comp~
+##  5 audi         a4           2.8  1999     6 auto~ f        16    26 p     comp~
+##  6 audi         a4           2.8  1999     6 manu~ f        18    26 p     comp~
+##  7 audi         a4           3.1  2008     6 auto~ f        18    27 p     comp~
+##  8 audi         a4 quattro   1.8  1999     4 manu~ 4        18    26 p     comp~
+##  9 audi         a4 quattro   1.8  1999     4 auto~ 4        16    25 p     comp~
+## 10 audi         a4 quattro   2    2008     4 manu~ 4        20    28 p     comp~
+## # ... with 224 more rows
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{head}\NormalTok{(mpg, }\AttributeTok{n =} \DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 1 x 11
+##   manufacturer model displ  year   cyl trans    drv     cty   hwy fl    class  
+##   <chr>        <chr> <dbl> <int> <int> <chr>    <chr> <int> <int> <chr> <chr>  
+## 1 audi         a4      1.8  1999     4 auto(l5) f        18    29 p     compact
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  This dataset has 234 rows and 11 columns.
+\item
+  (\href{https://ggplot2.tidyverse.org/reference/mpg.html}{MPG dataset
+  reference}).
+\end{itemize}
+
+\hypertarget{reading-and-writing-files}{%
+\subsection{Reading and Writing Files}\label{reading-and-writing-files}}
+
+The MPG dataset is pre-loaded in the TidyVerse package, but we could
+save it to a file and reload it from there.
+
+We can now read the MPG dataset back in from the file.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{write\_csv}\NormalTok{(mpg,}\StringTok{\textquotesingle{}data/mpgdataset.csv\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mpgdata }\OtherTok{\textless{}{-}} \FunctionTok{read\_csv}\NormalTok{(}\StringTok{\textquotesingle{}data/mpgdataset.csv\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Rows: 234 Columns: 11
+## -- Column specification --------------------------------------------------------
+## Delimiter: ","
+## chr (6): manufacturer, model, trans, drv, fl, class
+## dbl (5): displ, year, cyl, cty, hwy
+## 
+## i Use `spec()` to retrieve the full column specification for this data.
+## i Specify the column types or set `show_col_types = FALSE` to quiet this message.
+\end{verbatim}
+
+\hypertarget{including-images}{%
+\subsection{Including Images}\label{including-images}}
+
+RMarkdown allows us to include images.
+
+\includegraphics[width=1.35417in,height=\textheight]{https://cs.calvin.edu/courses/info/601/kvlinden/kvlinden/resources/images/rmarkdown-logo.png}
+
+\hypertarget{using-equations-and-inline-code}{%
+\subsection{Using Equations and Inline
+Code}\label{using-equations-and-inline-code}}
+
+RMarkdown also allows us to include equations and inline code
+computations. For example, Einstein's famous equation, \(e = mc^2\),
+tells us that given the speed of light (29979245800 cm/second), the
+energy stored in a mass of 1 gram is:
+\ensuremath{8.9875518\times 10^{20}}. (Yep, that's a pretty big number.)
+
+The average city mpg is 16.8589744 The average highway mpg 23.4401709
+
+\hypertarget{using-the-intermediate-data-types}{%
+\subsection{Using the Intermediate Data
+Types}\label{using-the-intermediate-data-types}}
+
+This document has already includes Tibbles (e.g., \texttt{mpg}), a
+particularly useful version of the standard data frame used to store
+datasets. The other data types we'll use in the course include Dates and
+Factors.
+
+A \emph{date} is a special type used to represent date-times. For
+example, it is currently 2022-09-12 10:20:38. Dates can be manipulated
+using the \texttt{lubridate} package.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{lubridate}\SpecialCharTok{::}\FunctionTok{make\_date}\NormalTok{(}\AttributeTok{year =}\NormalTok{ mpg}\SpecialCharTok{$}\NormalTok{year)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   [1] "1999-01-01" "1999-01-01" "2008-01-01" "2008-01-01" "1999-01-01"
+##   [6] "1999-01-01" "2008-01-01" "1999-01-01" "1999-01-01" "2008-01-01"
+##  [11] "2008-01-01" "1999-01-01" "1999-01-01" "2008-01-01" "2008-01-01"
+##  [16] "1999-01-01" "2008-01-01" "2008-01-01" "2008-01-01" "2008-01-01"
+##  [21] "2008-01-01" "1999-01-01" "2008-01-01" "1999-01-01" "1999-01-01"
+##  [26] "2008-01-01" "2008-01-01" "2008-01-01" "2008-01-01" "2008-01-01"
+##  [31] "1999-01-01" "1999-01-01" "1999-01-01" "2008-01-01" "1999-01-01"
+##  [36] "2008-01-01" "2008-01-01" "1999-01-01" "1999-01-01" "1999-01-01"
+##  [41] "1999-01-01" "2008-01-01" "2008-01-01" "2008-01-01" "1999-01-01"
+##  [46] "1999-01-01" "2008-01-01" "2008-01-01" "2008-01-01" "2008-01-01"
+##  [51] "1999-01-01" "1999-01-01" "2008-01-01" "2008-01-01" "2008-01-01"
+##  [56] "1999-01-01" "1999-01-01" "1999-01-01" "2008-01-01" "2008-01-01"
+##  [61] "2008-01-01" "1999-01-01" "2008-01-01" "1999-01-01" "2008-01-01"
+##  [66] "2008-01-01" "2008-01-01" "2008-01-01" "2008-01-01" "2008-01-01"
+##  [71] "1999-01-01" "1999-01-01" "2008-01-01" "1999-01-01" "1999-01-01"
+##  [76] "1999-01-01" "2008-01-01" "1999-01-01" "1999-01-01" "1999-01-01"
+##  [81] "2008-01-01" "2008-01-01" "1999-01-01" "1999-01-01" "1999-01-01"
+##  [86] "1999-01-01" "1999-01-01" "2008-01-01" "1999-01-01" "2008-01-01"
+##  [91] "1999-01-01" "1999-01-01" "2008-01-01" "2008-01-01" "1999-01-01"
+##  [96] "1999-01-01" "2008-01-01" "2008-01-01" "2008-01-01" "1999-01-01"
+## [101] "1999-01-01" "1999-01-01" "1999-01-01" "1999-01-01" "2008-01-01"
+## [106] "2008-01-01" "2008-01-01" "2008-01-01" "1999-01-01" "1999-01-01"
+## [111] "2008-01-01" "2008-01-01" "1999-01-01" "1999-01-01" "2008-01-01"
+## [116] "1999-01-01" "1999-01-01" "2008-01-01" "2008-01-01" "2008-01-01"
+## [121] "2008-01-01" "2008-01-01" "2008-01-01" "2008-01-01" "1999-01-01"
+## [126] "1999-01-01" "2008-01-01" "2008-01-01" "2008-01-01" "2008-01-01"
+## [131] "1999-01-01" "2008-01-01" "2008-01-01" "1999-01-01" "1999-01-01"
+## [136] "1999-01-01" "2008-01-01" "1999-01-01" "2008-01-01" "2008-01-01"
+## [141] "1999-01-01" "1999-01-01" "1999-01-01" "2008-01-01" "2008-01-01"
+## [146] "2008-01-01" "2008-01-01" "1999-01-01" "1999-01-01" "2008-01-01"
+## [151] "1999-01-01" "1999-01-01" "2008-01-01" "2008-01-01" "1999-01-01"
+## [156] "1999-01-01" "1999-01-01" "2008-01-01" "2008-01-01" "1999-01-01"
+## [161] "1999-01-01" "2008-01-01" "2008-01-01" "2008-01-01" "2008-01-01"
+## [166] "1999-01-01" "1999-01-01" "1999-01-01" "1999-01-01" "2008-01-01"
+## [171] "2008-01-01" "2008-01-01" "2008-01-01" "1999-01-01" "1999-01-01"
+## [176] "1999-01-01" "1999-01-01" "2008-01-01" "2008-01-01" "1999-01-01"
+## [181] "1999-01-01" "2008-01-01" "2008-01-01" "1999-01-01" "1999-01-01"
+## [186] "2008-01-01" "1999-01-01" "1999-01-01" "2008-01-01" "2008-01-01"
+## [191] "1999-01-01" "1999-01-01" "2008-01-01" "1999-01-01" "1999-01-01"
+## [196] "1999-01-01" "2008-01-01" "2008-01-01" "1999-01-01" "2008-01-01"
+## [201] "1999-01-01" "1999-01-01" "2008-01-01" "1999-01-01" "1999-01-01"
+## [206] "2008-01-01" "2008-01-01" "1999-01-01" "1999-01-01" "2008-01-01"
+## [211] "2008-01-01" "1999-01-01" "1999-01-01" "1999-01-01" "1999-01-01"
+## [216] "2008-01-01" "2008-01-01" "2008-01-01" "2008-01-01" "1999-01-01"
+## [221] "1999-01-01" "1999-01-01" "1999-01-01" "1999-01-01" "1999-01-01"
+## [226] "2008-01-01" "2008-01-01" "1999-01-01" "1999-01-01" "2008-01-01"
+## [231] "2008-01-01" "1999-01-01" "1999-01-01" "2008-01-01"
+\end{verbatim}
+
+A \emph{factor} is a special type of \emph{vector} used to represent
+categorical data values. For example, though the drive variable in the
+MPG dataset is represented as a character, it's probably best seen as a
+value from a short list of possible categories: `f', `4', \ldots{}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{as.factor}\NormalTok{(mpg}\SpecialCharTok{$}\NormalTok{drv)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   [1] f f f f f f f 4 4 4 4 4 4 4 4 4 4 4 r r r r r r r r r r 4 4 4 4 f f f f f
+##  [38] f f f f f f f f f f f 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+##  [75] r r r 4 4 4 4 4 4 4 4 4 4 4 4 4 r r r r r r r r r f f f f f f f f f f f f
+## [112] f f f f f f f f f f f 4 4 4 4 4 4 4 4 4 4 4 4 r r r 4 4 4 4 f f f f f f f
+## [149] f f 4 4 4 4 f f f f f 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 f f f f f f
+## [186] f f f f f f f f f f f f f 4 4 4 4 4 4 4 4 4 f f f f f f f f f f f f f f f
+## [223] f f f f f f f f f f f f
+## Levels: 4 f r
+\end{verbatim}
+
+The variables stand for wheel drive types.
+
+\hypertarget{exploring-the-data}{%
+\subsection{Exploring the Data}\label{exploring-the-data}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mpg}\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{count}\NormalTok{(class, }\AttributeTok{sort =} \ConstantTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 7 x 2
+##   class          n
+##   <chr>      <int>
+## 1 suv           62
+## 2 compact       47
+## 3 midsize       41
+## 4 subcompact    35
+## 5 pickup        33
+## 6 minivan       11
+## 7 2seater        5
+\end{verbatim}
+
+The most popular car class in the dataset is an SUV, while the least
+popular is a 2 seater.
+
+*Exercise based on \href{https://datasciencebox.org/}{Data Science in a
+Box}
+
+\end{document}

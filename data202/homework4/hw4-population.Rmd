@@ -1,0 +1,71 @@
+---
+title: "DATA 202 Homework 4"
+author: "Sherise Immanuela"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_download: true
+---
+
+```{r setup, include=FALSE}
+# Set some useful chunk options for code chunks.
+knitr::opts_chunk$set(
+  echo = TRUE,
+  error = TRUE,    # display errors but keep going.
+  comment = "",    # don't add '##' characters before output.
+  message = FALSE  # don't include messages in the knitted output (check them in RStudio)
+  )
+library(tidyverse)
+theme_set(theme_bw())
+```
+
+## Reading in Data
+
+```{r}
+country_codes <- read_csv ("data/country-codes.csv")
+country_pop <- read_csv("data/country-population.csv")
+```
+
+## Querying Raw Population Data
+
+```{r}
+country_pop2 <- country_pop %>% 
+  gather( key = "year", value = "pop", -country, convert = TRUE)
+
+country_population <-  full_join(country_pop2, country_codes, by = c ("country" = "code"))
+```
+
+
+```{r}
+country_names <- c(`sgp` = "Singapore", `hkg` = "Hong Kong", `mys` = "Malaysia", `phl` = "Philippines", `tha` = "Thailand", `vnm` = "Vietnam", `khm` = "Cambodia", `mmr` = "Myanmar")
+
+country_population %>%
+  filter(country %in% c ("sgp", "hkg","mys", "mmr", "phl","tha", "vnm", "khm")) %>%
+  filter(year %in% c("2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015")) %>%
+  ggplot() +
+  aes(x = year, y = pop) +
+  labs(title = "Southeast Asian Populations Over Time", x = "Year", y = "Population")+
+  facet_wrap(~country, labeller = as_labeller(country_names))+
+  geom_line()
+```
+
+## Exploring the Data
+
+```{r}
+country_names2 <- c(`chn` = "China", `ind` = "India", `usa` = "United States", `idn` = "Indonesia", `pak` = "Pakistan")
+
+country_population %>%
+  filter(country %in% c("chn", "ind", "usa", "idn", "pak")) %>%
+  ggplot() +
+  aes(x = year, y = pop) +
+  labs(title = "Growth of Population in the Top 5 Most Populated Countries (1800-2015)", x = "Year", y = "Population")+
+  facet_wrap(~country, labeller = as_labeller(country_names2))+
+  geom_line()
+```
+
+How does growth of population look like in the top 5 most populated countries?
+
+From this graph, we can see that the two most populated countries, China and India, still maintain a high population growth. The rest of the top 5 have a similar level of growth of population. Another observation worth mentioning is that all five countries' population growth had a large increase starting 1950. Indonesia, Pakistan, and United States have maintained a linear growth. On the other hand, China and India seems to have a more exponential growth.
+
+Not only do they already have very large populations, the level of growth is also very steep. In conclusion, it appears that China and India will continue to hold their place as the top 2 countries with the highest number of population.
+

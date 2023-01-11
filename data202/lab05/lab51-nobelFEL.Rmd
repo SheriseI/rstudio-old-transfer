@@ -1,0 +1,169 @@
+---
+title: "Lab 5.1 - Nobel Laureates"
+author: "Felicia S"
+date: "Fall 2022"
+output:
+  html_document:
+    code_download: true
+---
+
+```{r load-packages, message=FALSE}
+library(tidyverse) 
+```
+
+This analysis explores the data used by P. Aldhous in [this Buzzfeed article](https://www.buzzfeednews.com/article/peteraldhous/immigration-and-science). The article claims that one key factor in the US's leadership in science and technology is immigration because while most living Nobel laureates in the sciences are based in the US, many of them were born in other countries.
+
+## The Dataset
+
+🚧
+You'll need to get [the nobel dataset](https://cs.calvin.edu/courses/info/601/05wrangling/lab/data/nobel.csv), install it in a `data` folder, and load it.
+
+```{r}
+nobel <- read_csv("data/nobel.csv")
+```
+
+
+🚧
+Because there is no formal webpage for this dataset, study the dataset and give a short summary here on what it contains. How many observations and how many variables are in the dataset? What does each observation represent? Use inline code to answer this question. Please include this data dictionary.
+
+There are 935 observations and 26 variables in the dataset. Each observation represents a nobel prize winner. 
+It tells us their `firstname`, `surname`, what `year the prize was won`, `which city and country`, `where the laureate 
+was born`, `when the laureate was born and died`, and a lot of other details:
+
+- `id`: ID number
+- `firstname`: First name of laureate
+- `surname`: Surname 
+- `year`: Year prize won
+- `category`: Category of prize
+- `affiliation`: Affiliation of laureate
+- `city`: City of laureate in prize year
+- `country`: Country of laureate in prize year
+- `born_date`: Birth date of laureate
+- `died_date`: Death date of laureate
+- `gender`: Gender of laureate
+- `born_city`: City where laureate was born
+- `born_country`: Country where laureate was born
+- `born_country_code`: Code of country where laureate was born
+- `died_city`: City where laureate died
+- `died_country`: Country where laureate died
+- `died_country_code`: Code of country where laureate died
+- `overall_motivation`: Overall motivation for recognition
+- `share`: Number of other winners award is shared with
+- `motivation`: Motivation for recognition
+
+In a few cases the name of the city/country changed after laureate was given (e.g. in 1975 Bosnia and Herzegovina was part of the Socialist Federative Republic of Yugoslavia). In these cases the variables below reflect a different name than their counterparts without the suffix `_original`.
+
+- `born_country_original`: Original country where laureate was born
+- `born_city_original`: Original city where laureate was born
+- `died_country_original`: Original country where laureate died
+- `died_city_original`: Original city where laureate died
+- `city_original`: Original city where laureate lived at the time of winning the award
+- `country_original`: Original country where laureate lived at the time of winning the award
+
+## Cleansing the Data
+
+🚧
+Create a new data frame called `nobel_living` that includes only:
+
+- laureates for whom country is available (i.e., it isn't `NA` -- remember to use the `is.na()` function)
+- laureates who are people as opposed to organizations (organizations are denoted with `"org"` as their gender)
+- laureates who are still alive (their died_date is `NA`)
+
+Confirm that once you have filtered for these characteristics you are left with a data frame with 228 observations.
+
+```{r}
+nobel_living <- nobel %>% 
+  filter(!is.na(country) & gender != "org" & is.na(died_date))
+```
+
+
+## Determining Where Nobel Laureates Lived
+
+The Buzzfeed article claims that most living Nobel laureates were based in the US when they won their prizes. First, we'll create a new variable to identify whether the laureate was in the US when they won their prize.
+
+We include a `mutate()` function that uses a functional variant of the classic "if" statement, called `if_else()`, to create this variable. The arguments to this new function, to be covered in more detail later in the course, are:
+
+- the condition for which we're testing (e.g., is the country the USA?)
+- the value to use if the condition is true (e.g., if `country` is equal to `"USA"`, it gives us `"USA"`)
+- the value to use otherwise (e.g., if the country isn't `"USA"`, we get `"Other"`).
+
+```{r eval = FALSE}
+  mutate(
+    country_us = if_else(country == "USA", "USA", "Other")
+  )
+```
+
+🚧
+Add a code chunk that creates a data frame called `nobel_living_science` by combining the two transformations above into a pipeline: use the `mutate()` with the `if_else` discussed above to create the a `country_us` variable; and use `filter()` to limit the results to include only categories with values `%in%` "Physics", "Medicine", "Chemistry", "Economics". 
+
+```{r}
+nobel_living_science <- nobel_living %>% 
+  mutate(
+    country_us = if_else(country == "USA", "USA", "Other"),
+#Adding a new variable for where they were born
+    born_country_us = if_else(born_country == "USA", "USA", "Other")) %>% 
+  filter(category %in% c("Physics", "Medicine", "Chemistry", "Economics" ))
+
+
+
+```
+
+
+🚧
+Create a faceted bar plot, with horizontal bars, visualizing the relationship between the category of prize and whether the laureate was in the US when they won the Nobel prize. Interpret your visualization, and say a few words about whether the Buzzfeed headline is supported by the data.
+
+- Your visualization should be faceted by category.
+- For each facet you should have two bars, one for winners in the US and one for Other. 
+
+```{r faceted bar plot}
+ggplot(data = nobel_living_science) +
+  geom_bar(mapping = aes( y = country_us))+
+  facet_wrap(category ~.) +
+  labs ( x = "Number of Nobel Laureates",
+         y = "Country they lived in when winning"
+         )
+```
+
+The buzzfeed headline is supported by the data. The data does suggest that the most living Nobel laureated were based in the US when they won the prize.
+
+## Determining Where Nobel Laureates Were Born
+
+🚧
+Go back to the code chunk that created `nobel_living_science` and add a new variable called `born_country_us` that has the value `"USA"` if the laureate is born in the US, and `"Other"` otherwise. Do this by modifying your earlier code chunk; you won't add anything new here.
+
+🚧
+Remake your visualization and add a second variable: whether the laureate was born in the US or not. Your final visualization should contain a facet for each category, within each facet a bar for whether they won the award in the US or not, and within each bar whether they were born in the US or not. (Don't over-think this: you can do this by just adding another aesthetic mapping!) Based on your visualization, do the data appear to support Buzzfeed's claim? Explain your reasoning in 1-2 sentences.
+
+```{r}
+ggplot(data = nobel_living_science) +
+  geom_bar(mapping = aes( y = country_us, fill = born_country_us,))+
+  facet_wrap(category ~.) +
+  labs ( x = "Number of Nobel Laureates",
+         y = "Country where price won"
+         )
+```
+
+
+The data show that very few Nobel prize winners who won in other countries emmigrated there from the US. There are some poeple who emmigrated to the US and won the nobel price, but it isn't a significant amount of people. In all 4 fields, laureates who won nobel in the US are more likely to be born in the US as well.
+
+## Determining Where Immigrant Nobel Laureates Were Born
+
+🚧
+Make a table for where immigrant Nobelists were born, using a single pipeline:
+
+- filter for living STEM laureates who won their prize in the US, but were born outside of the US,
+- then create a frequency table for their birth country, `born_country`,
+- then sort the result in descending order of number of Nobelists for each country.
+
+```{r}
+nobel_living_science %>% 
+ mutate(
+   born_country_not_us = born_country ) %>% 
+  group_by(born_country_not_us) %>% 
+  summarise(n = n())
+```
+
+
+## Recreating the Buzzfeed Visualizations [OPTIONAL]
+
+The plots in the Buzzfeed article are called waffle plots. You can find the code used for making these plots in Buzzfeed's GitHub repo (yes, they have one!) [here](https://buzzfeednews.github.io/2017-01-immigration-and-science/). You're not expected to recreate them as part of your assignment, but you're welcome to do so for fun!

@@ -1,0 +1,123 @@
+---
+title: "DATA 202 Homework 2"
+author: "Sherise Immanuela"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_download: true
+---
+
+```{r setup, include=FALSE}
+# Set some useful chunk options for code chunks.
+knitr::opts_chunk$set(
+  echo = TRUE,
+  error = TRUE,    # display errors but keep going.
+  comment = "",    # don't add '##' characters before output.
+  message = FALSE  # don't include messages in the knitted output (check them in RStudio)
+  )
+library(tidyverse)
+theme_set(theme_bw())
+```
+
+## Reading the data
+
+```{r read-bikeshare}
+daily_rides <- read_csv("data/bikeshare-day.csv") %>%
+    mutate(across(c(season, year, holiday, workingday, day_of_week, weather_type, rider_type), as.factor))
+glimpse(daily_rides)
+```
+
+
+## Exercise 1: Label days of week
+
+```{r}
+daily_rides <- daily_rides %>%
+  mutate(day_of_week = factor(day_of_week, levels = c(0, 1, 2, 3, 4, 5, 6), 
+                              labels = c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")))
+```
+Here, we're mapping the day_of_week that was in numbers 0-6 to the actual name of the day. For instance, "Sunday" is mapped to 0 and "Monday" is mapped to 1. We can confirm the results are correct by checking the table on the environment tab.
+
+# Exercise 2: Describe a row
+```{r}
+head(daily_rides)
+```
+The first row shows that on January 1, 2011, there were 331 rides by casual riders. That day is a weekend (Saturday) and not a holiday.
+
+# Exercise 3: Rides by date, by rider type
+```{r}
+daily_rides %>%
+  ggplot() +
+  aes(x = date, y = rides, color=rider_type) +
+  geom_point(size=1, alpha=0.5) +
+  geom_smooth() +
+  labs(
+    x = "Date", 
+    y = "Number of rides"
+  )
+```
+
+According to this plot, the number of casual riders hasn't experienced much growth between 2011-2013.
+Meanwhile, there's quite an increase of registered rides between 2011-2013. 
+By 2013, there's a ~3000 difference between the number of registered riders and casual riders.
+
+# Exercise 4: Mapping vs Faceting
+```{r}
+daily_rides %>%
+  ggplot() +
+  aes(x = date, y = rides, color=workingday) +
+  geom_point(size=1, alpha=0.5) +
+  facet_wrap(vars(rider_type)) +
+  geom_smooth() +
+  labs(
+    x = "Date", 
+    y = "Number of rides"
+  )
+```
+
+```{r}
+daily_rides %>%
+  ggplot() +
+  aes(x = date, y = rides, color=rider_type) +
+  geom_point(size=1, alpha=0.5) +
+  facet_wrap(vars(workingday)) +
+  geom_smooth() +
+  labs(
+    x = "Date", 
+    y = "Number of rides"
+  )
+```
+
+The two plots make use of the same exact variables. However, when faceted by rider_type, the first plot focuses more on seeing the difference between the number of casual riders and the number of registered riders.The second plot focuses more on the difference between rides on the weekend and rides on the workday.
+
+We can see from the first graph that there is a similar growth level between casual and registered riders 
+regardless of working day. Casual riders have a rather stagnant growth, while registered riders have a high steady increase in number.
+
+From the second graph, we can see that casual and registered riders follow a similar pattern of growth on the weekend. The huge gap between casual and registered riders on the workday might explain that the company has a larger customer base of people who regularly use rental bikes to go to work. 
+
+# Exercise 5: How does ridership vary over a typical week?
+```{r}
+daily_rides %>%
+  ggplot() +
+  aes(x = day_of_week, y = rides, fill = rider_type) +
+  geom_boxplot() +
+  labs(
+    x = "Day of week", 
+    y = "Number of rides"
+  )
+```
+
+The plot shows that the number of casual riders throughout the week is highest on weekdays, and decreases quite a bit on weekends. On the contrary, there is a similar number of casual riders throughout the weekday, but a much higher number on the weekends.
+
+# Exercise 6: Plot of your choice
+```{r}
+daily_rides %>%
+  ggplot() +
+  aes(x = weather_type, y = rides, fill = rider_type) +
+  geom_boxplot() +
+  labs(
+    x = "Weather Type", 
+    y = "Number of Rides"
+  )
+```
+
+This plot suggests that casual riders will not choose to use a bike rental service if the weather is really bad, while many registered riders still use their bikes. 

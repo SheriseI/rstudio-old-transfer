@@ -1,0 +1,108 @@
+---
+title: "Hotel Booking Demand Predictive Analytics"
+author: "Sherise Immanuela & Tanya Nyamwiwa"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_download: true
+---
+
+```{r setup, include=FALSE}
+# Set some useful chunk options for code chunks.
+knitr::opts_chunk$set(
+  echo = TRUE,
+  error = TRUE,    # display errors but keep going.
+  comment = "",    # don't add '##' characters before output.
+  message = FALSE  # don't include messages in the knitted output (check them in RStudio)
+  )
+library(tidyverse)
+theme_set(theme_bw())
+```
+
+## Overview
+
+### Question
+What makes people cancel their hotel bookings?
+
+### Summary of Findings
+
+## Prior Work
+
+### Summary and critique of prior work
+
+Ideally this section compares two different prior analyses on similar topics.
+
+### How this project extends prior work
+
+## Approach
+
+### Problem Description
+
+### Data
+
+#### Provenance
+
+#### Structure
+
+#### Appropriateness for task
+
+### Modeling Question and Approach
+
+## Exploratory Data Analysis
+
+```{r}
+hotel_bookings <- read.csv("data/hotel_bookings.csv")
+```
+
+Which months are the busiest?
+```{r}
+#hotel_bookings |>
+#  ggplot() +
+#  aes(x = arrival_date_month, y = adr) +
+#  geom_line(aes(color = hotel))
+  #scale_fill_viridis_d() +
+  #theme_minimal()
+```
+
+```{r}
+hotel_bookings$arrival_date_month = factor(hotel_bookings$arrival_date_month, levels = month.name)
+
+ggplot(hotel_bookings, aes(x=arrival_date_month, fill = hotel))+
+  geom_bar(position = 'dodge')+
+  ylab('Number of Hotel Bookings ')+
+  xlab('Month')+
+  ggtitle('Average Number of Hotel Bookings per Month')+
+  labs(fill='Hotel')+
+  theme_minimal()
+
+```
+
+```{r}
+checkout = hotel_bookings  %>% filter(reservation_status == 'Check-Out') 
+dim(checkout)
+
+ggplot(checkout, aes(customer_type, fill=hotel)) +
+  geom_bar(stat='count', position=position_dodge())+
+  ylab('Count')+
+  xlab('Booking type')+
+  ggtitle('Type of Booking by Different Hotel Type') +
+  labs(fill='Hotel type')+
+  theme_minimal()
+```
+
+```{r}
+hotel_bookings |>
+  ggplot() +
+  aes(lead_time)+ 
+  geom_histogram(binwidth = 0.8,col='turquoise' )+ 
+  facet_wrap(~ is_canceled)
+```
+
+### Individual Variables
+### Combinations of Variables
+## Modeling
+## Summary
+### Discussion of Findings
+This section must compare two different approaches (models, representation choices, evaluation methods, or whatever you have chosen).
+### Limitations and Social / Ethical Considerations
+### Future Directions

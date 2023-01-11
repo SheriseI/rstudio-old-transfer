@@ -1,0 +1,115 @@
+---
+title: "DATA 202 Homework 5"
+author: "Sherise Immanuela"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_download: true
+---
+
+```{r setup, include=FALSE}
+# Set some useful chunk options for code chunks.
+knitr::opts_chunk$set(
+  echo = TRUE,
+  error = TRUE,    # display errors but keep going.
+  comment = "",    # don't add '##' characters before output.
+  message = FALSE  # don't include messages in the knitted output (check them in RStudio)
+  )
+library(tidyverse)
+library(tidymodels)
+library(mosaic)
+library(broom)
+theme_set(theme_bw())
+```
+
+## Exercise 1
+
+```{r}
+gestation_no_missing <- mosaicData::Gestation %>% filter(!is.na(age))
+gestation_no_missing %>% summarize(mean(age))
+```
+A colleague sees this result and says, “Ah, so people give birth when they’re around 27 years old.”
+Flaw #1: The statement seems to refer to a population, while the mean computed is from a sample. Not all women give birth when they are 27, it is an average age of the women in the sample that give birth.
+Flaw #2: Another flaw in this statement is using the word "people" when only women can give birth. 
+
+## Exercise 2
+
+```{r}
+mosaic::set.rseed(123)
+bootstrap <-
+  mosaic::do(1000) * {
+    gestation_no_missing %>% 
+      mosaic::resample() %>% 
+      summarize(mean_age = mean(age))
+  }
+ci_stats <- mosaic::cdata(~ mean_age, data = bootstrap, p = 0.95)
+ci_stats
+```
+
+```{r}
+ggplot(gestation_no_missing, aes(x = age)) + geom_histogram(binwidth = 1.0) +
+  geom_vline(xintercept = ci_stats$lower, color = "red") +
+  geom_vline(xintercept = ci_stats$upper, color = "red")
+```
+
+A colleague is puzzled: why is most of the data outside of the confidence interval? Explain why this situation actually makes sense.
+
+This situation makes sense because the data represents all of the values in the dataset, while in a 95% confidence interval, we are showing 95% of the samples from the population that actually contain the true mean. The CI generated through bootstrap resample shows the range of values that contain the true mean for the population. Most of the data would not be included since they aren't close to the mean. 
+
+## Exercise 3
+### a.
+```{r}
+gestation_no_missing %>%
+  ggplot(aes(x=gestation, y=wt)) +
+  geom_point() +
+  labs(x="gestation duration (days)", y="birth weight (oz)")
+```
+
+### b.
+```{r}
+data <- mosaicData::Gestation
+bw_l <- lm(wt ~ gestation, data = data)
+bw_l
+```
+
+$wt = -10.06 + 0.4643(gestation)$ when gestation suration = 250 days
+
+$Gestation = -10.0714 + 0.4643(250) = 106$
+
+The model predicts that the birth weight is 106.015 ounces (about 6.6 pounds) at 250 days of pregnancy.
+
+### c.
+```{r}
+bw_l %>% 
+  tidy(conf.int = TRUE) %>% 
+  select(term, estimate, conf.low, conf.high)
+```
+
+For 95% of the samples from the population, the CI (0.41 to 0.52) will contain the true mean.
+
+### d.
+```{r}
+gestation_no_missing %>%
+  ggplot(aes(x=age, y=wt)) +
+  geom_point() +
+  labs(x="mother's age at termination of pregnancy (years)", y="birth weight (oz)")
+```
+
+```{r}
+data <- mosaicData::Gestation
+bwa_l <- lm(wt ~ age, data = data)
+bwa_l
+```
+
+```{r}
+bwa_l %>% 
+  tidy(conf.int = TRUE) %>% 
+  select(term, estimate, conf.low, conf.high)
+```
+
+Model equation: $wt = 116.68 + 0.1062(age)$
+
+For 95% of the samples from the population, the CI (-0.07 to 0.28) will contain the true mean.
+In other words, 95% of babies will be born between 112 and 122 ounces. 
+From the model equation, it seems that age has a low impact to total ounces of a baby's weight.  
+

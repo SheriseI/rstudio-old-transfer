@@ -1,0 +1,102 @@
+---
+title: "Lab 4.1 - Plotting with `ggplot2`"
+author: "Sherise Immanuela"
+date: "Fall 2022"
+output:
+  html_document:
+    code_download: true
+---
+
+This document is a record of some basic ggplot2 exercises.
+
+```{r setup, message=FALSE}
+library(tidyverse)
+library(gapminder)
+library(forcats)
+
+# Put the data in the Environment
+gapminder <- gapminder::gapminder
+
+# Extract the data for the latest year in the dataset, for plots that don't involve year.
+gapminder_latest <- filter(gapminder, year == 2007)
+```
+The `gapminder` tibble has 1704 observations. It contains all data from 1952 to 2007, so each country has multiple rows of data.
+The `gapminder_latest` tibble has 142 observations (142 countries). It only contains data for 2007, and each country has exactly one row of data.
+
+## Styling and labeling plots
+
+```{r Life Expectancy by Year Plot}
+gapminder %>% 
+  filter(country == "United States") %>% 
+  ggplot() +
+  aes(x = year, y = lifeExp) +
+  labs(x = "Year", y = "Life Expectancy", title = "Life Expectancy in the US from 1950-2007") +
+  geom_line(color="green")
+```
+
+This visualization suggests that life expectancy has steadily increased year by year. In fact, life expectancy has increased by 10 years since 1950.
+
+## Mapping vs Facetingy
+
+```{r country-lifeExp, fig.height=5, fig.width=15}
+countries <- c(
+  "China", "India", "United States",
+  "Indonesia", "Brazil", "Pakistan",
+  "Bangladesh", "Nigeria", "Japan")
+
+gapminder %>% 
+  filter(country %in% countries) %>% 
+  ggplot() +
+  aes(x = year, y = lifeExp) +
+  geom_line() +
+  facet_wrap(vars(country), scales = "free_y")
+```
+
+The visualization suggests that all countries have had an increase in life expectancy over the years.
+It appears that Nigeria had a small decrease during 1990-2000. China also had a decrease during 1955-1960. 
+
+## Univariate analysis --- Continuous
+
+```{r lifeExp-Continents, fig.height=5, fig.width=10}
+gapminder %>% 
+  ggplot() +
+  aes(x = lifeExp) +
+  geom_histogram() +
+  facet_wrap(vars(continent), scales = "free_y")
+```
+This graph attempts to explore the distribution of life expectancy in respect of continents. 
+Americas, Asia, and America are more skewed to the left meaning life expectancy are at a higher level of occurrences at the high end of the distribution.
+
+## Univariate Analysis --- Categorical
+
+```{r Number of Countries by Continent}
+gapminder_latest %>% 
+  ggplot() +
+  aes(x = fct_infreq(continent)) +
+  labs(x = "Continent", y = "Number of Countries", title = "Number of Countries by Continent") +
+  geom_bar() 
+```
+
+Africa is the continent that has the highest number of countries (over 50).
+Asia and Europe has similar numbers of countries (around 30).
+Oceania has the least number of countries (less than 5).
+
+## Bivariate Analysis --- Numerical/Categorical
+
+```{r gdpPercap-year-continent, fig.height=5, fig.width=15}
+gapminder %>% 
+  ggplot() +
+  aes(x = year, y = gdpPercap, group=country) +
+  geom_line(alpha=0.6) +
+  facet_wrap(vars(continent),  scales = "free_y")
+```
+Overall, there's a positive trend in GDP per capita growth in most continent.
+From this graph, it appears that countries in Europe and Oceania have a relatively higher growth rate of GDP per capita.
+Most countries in Asia have a positive GDP per capita growth, except one country (Kuwait) that took a really steep decrease in GDP per capita.
+It appears that Africa has the lowest level of growth in GDP per capita. Some countries have a good growth rate, but most countries have a low growth rate.
+
+
+
+
+
+

@@ -1,0 +1,115 @@
+---
+title: "DATA 202 Homework 5"
+author: "Ryan Dick"
+date: "11/02/2022"
+output:
+  html_document:
+    code_download: true
+---
+
+```{r setup, include=FALSE}
+# Set some useful chunk options for code chunks.
+knitr::opts_chunk$set(
+  echo = TRUE,
+  error = TRUE,    # display errors but keep going.
+  comment = "",    # don't add '##' characters before output.
+  message = FALSE  # don't include messages in the knitted output (check them in RStudio)
+  )
+library(tidyverse)
+library(tidymodels)
+library(mosaic)
+library(broom)
+theme_set(theme_bw())
+```
+
+## Exercise 1
+
+```{r baby age}
+gestation_no_missing <- mosaicData::Gestation %>% filter(!is.na(age))
+gestation_no_missing %>% summarize(mean(age))
+```
+
+One flaw with this statement is that not all women give birth when they are 27, it is an average age of the women that give birth.
+
+Another flaw in this statement is that only women can give birth. Saying people give birth when they are around 27 can be misleading. This is the average age that the mother is when the pregnancy ends, not the father.
+
+## Exercise 2
+
+```{r graph baby}
+mosaic::set.rseed(123)
+bootstrap <-
+  mosaic::do(1000) * {
+    gestation_no_missing %>% 
+      mosaic::resample() %>% 
+      summarize(mean_age = mean(age))
+  }
+ci_stats <- mosaic::cdata(~ mean_age, data = bootstrap, p = 0.95)
+ci_stats
+
+ggplot(gestation_no_missing, aes(x = age)) + geom_histogram(binwidth = 1.0) +
+  geom_vline(xintercept = ci_stats$lower, color = "red") +
+  geom_vline(xintercept = ci_stats$upper, color = "red")
+```
+
+Most of the data is outside of the confidence interval when you go through the data and narrow it down. This makes sense because in a 95% confidence interval, you are showing 95% of the samples from the population that actually contain the true mean. This is a range that is close to the actual mean. A confidence interval shows the percentage amount that contains the true mean, so most of the data would be left out since all the data isn't close to the mean. Also, a 95% confidence interval means that you are 95% confident that the population mean is between the low and the high range. So, this again would make sense as the lower and higher ends of the data set would not be close to the mean.
+
+## Exercise 3
+
+```{r graph gestation and days, warning=FALSE}
+gestation_no_missing %>%
+  ggplot() +
+  aes(x = gestation, y=wt) +
+  geom_point() +
+  labs (
+    x="gestation duration (days)",
+    y="birth weight (oz)"
+  ) 
+```
+
+```{r linear model, warning=FALSE}
+model <- lm(wt~gestation, data=gestation_no_missing)
+model
+```
+
+```{r model}
+
+model %>% 
+  tidy(conf.int = TRUE) %>% 
+  select(term, estimate, conf.low, conf.high)
+```
+
+Gestation = -10.0714 + 0.4643(gestation)
+
+Gestation = -10.0714 + 0.4643(250) = 106
+
+This makes sense, at 250 days of pregancy the baby would be 106 ounces, which is about 6.625 pounds.
+
+95% of the means lie within the upper and lower bounds of the confidence interval. 
+
+## Exercise 3D
+```{r graph birth weight and age}
+gestation_no_missing %>%
+  ggplot() +
+  aes(x = age, y=wt) +
+  geom_point() +
+  labs (
+    x="mother's age at termination of pregnancy (years)",
+    y="birth weight (oz)"
+  )
+```
+
+```{r linear model part B, warning=FALSE}
+model2 <- lm(wt~age, data=gestation_no_missing)
+model2
+```
+
+Birth Weight = 116.6835 + 0.1062(age)
+
+```{r model2}
+
+model2 %>% 
+  tidy(conf.int = TRUE) %>% 
+  select(term, estimate, conf.low, conf.high)
+```
+
+The confidence interval shows that 95% of babies will be born between 112 and 122 ounces, but the age has little to no effect on the weight as it is only a tenth of the age. The estimate is only .1 which has a minimal impact on the total ounces.

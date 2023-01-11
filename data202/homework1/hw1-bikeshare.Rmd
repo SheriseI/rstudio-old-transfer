@@ -1,0 +1,60 @@
+---
+title: "hw1-bikeshare"
+output: html_document
+author: "Sherise Immanuela"
+date: "Fall 2022"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Capital Bikeshare
+
+## The Purpose
+
+In this document, we explore the bikeshare dataset to help Capital Bikeshare understand and predict the hourly demand for rental bikes. This understanding will help them plan the number of bikes that need to be available at different parts of the system at different times so that they can avoid cases in which: - someone wants a bike but the station is empty. - someone wants to return a bike but the station is full.
+
+## The Dataset
+
+The data for this problem were collected from the Capital Bikeshare program over the course of two years (2011 and 2012). Researchers at the University of Porto processed the data and augmented it with extra information, as described on this [UCI ML Repository webpage](https://archive.ics.uci.edu/ml/datasets/bike+sharing+dataset).
+
+```{r}
+library(tidyverse)
+bikedata <- read_csv('data/bikeshare-day-simple.csv')
+head(bikedata)
+```
+
+## The Analysis
+1. The dataset consists of 4 fields: date, day_of_week, workingday, and total_rides. The date variable is ordered year-month-day. The day_of_week is a quantitative variable (0 to 6). The workingday variable classifies the day into 'weekend' and 'workday'. Lastly, the total_rides variable is also quantitative, describing the count of rides each day.
+
+2. The dataset has 731 rows. Each row represents the bike rentals that happens on a specific day. 
+
+3. 
+```{r}
+bikedata %>%
+  ggplot() +
+  aes(x = date, y = total_rides) +
+  geom_point() +
+  geom_smooth() +
+  labs(
+    x = "date", 
+    y = "number of rides"
+  )
+```
+
+4.
+```{r}
+bikedata %>%
+  ggplot() +
+  aes(x = date, y = total_rides, color=workingday) +
+  geom_point() +
+  geom_smooth() +
+  labs(
+    x = "date", 
+    y = "number of rides"
+  )
+```
+
+5. Although both follow the same trendline throughout the years, the number of rides on weekdays have always outnumbered the number of rides on weekends. Based on this information, we can make a guess that Bikeshare riders primarily use the company's bike to commute to work. 
+
